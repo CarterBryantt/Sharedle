@@ -241,6 +241,7 @@ p {
 
 	border-radius: 6px;
 	border: solid 2px #2e2e2f;
+	padding: 0px;
 }
 
 #wordle-index:focus {
@@ -349,5 +350,13 @@ input[type=number] {
 
 		line-height: 37.5px;
 		font-size: 21.8px;
+	}
+
+	#wordle-index {
+		width: 70%;
+		height: 25%;
+		margin: 10% auto 0px;
+
+		font-size: 33.75px;
 	}
 }
