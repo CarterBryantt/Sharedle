@@ -3,7 +3,7 @@ import {byDate as wordles, valid as validWords, all as allWords, futureWords} fr
 // ------------------------------------------------------------------------
 // INPUT
 // ------------------------------------------------------------------------
-let disableInput = false;
+let disableInput = true;
 
 let currentGuess = ""; // String to keep track of the current word being input
 let guessCount = 0; // Number to keep track of how many guesses the user has made
@@ -116,7 +116,7 @@ function updateWord() {
 function showHideScreen() {
 	document.getElementById('start-screen').style.display = ["flex", "none"][activeScreen]; // If active screen = 0, display start screen
 	document.getElementById('end-screen').style.display = ["flex", "none"][1^activeScreen]; // If active screen = 1, display end screen
-	
+
 	let overlay = document.querySelector('.overlay');
 	switch(window.getComputedStyle(overlay).display) {
 		case "block":
