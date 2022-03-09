@@ -115,7 +115,7 @@ function updateWord() {
 
 function showHideScreen() {
 	document.getElementById('start-screen').style.display = ["flex", "none"][activeScreen]; // If active screen = 0, display start screen
-	document.getElementById('end-screen').style.display = ["block", "none"][1^activeScreen]; // If active screen = 1, display end screen
+	document.getElementById('end-screen').style.display = ["flex", "none"][1^activeScreen]; // If active screen = 1, display end screen
 	
 	let overlay = document.querySelector('.overlay');
 	switch(window.getComputedStyle(overlay).display) {
