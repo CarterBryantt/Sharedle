@@ -10,6 +10,9 @@
 	--absent: #3a3a3c;
 	
 	font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+
+	-webkit-user-select: none;
+	user-select: none;
 }
 
 body {
@@ -52,9 +55,6 @@ p {
 	font-size: 58px;
 	line-height: 73px;
 	color: white;
-	
-	-webkit-user-select: none;
-	user-select: none;
 }
 
 .pop {
@@ -132,8 +132,6 @@ p {
 	text-align: center;
 	line-height: 38px;
 	
-	-webkit-user-select: none;
-	user-select: none;
 	cursor: pointer;
 }
 
@@ -205,7 +203,7 @@ p {
 #wordle {
 	width: 240px;
 	height: 30px;
-	margin: auto;
+	margin: 10% auto 0px;
 	
 	text-align: center;
 	font-size: 20px;
@@ -252,6 +250,12 @@ input[type=number] {
 }
 
 @media screen and (max-width: 620px) {
+	p {
+		padding: 7.5px;
+		
+		font-size: 12.5px;
+	}
+	
 	/* CONTAINER */
 	.container {
 		width: 250px;
@@ -319,8 +323,8 @@ input[type=number] {
 		line-height: 22.5px;
 	}
 	
-	/* END SCREEN */
-	#overlay {
+	/* OVERLAY */
+	.screen {
 		width: 162.5px;
 		height: 237.5px;
 		margin: 62.5px auto;

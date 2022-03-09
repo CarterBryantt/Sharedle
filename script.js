@@ -114,11 +114,20 @@ function updateWord() {
 } // Update word using key presses
 
 function showHideScreen() {
-	document.getElementById('start-screen').style.display = ["block", "none"][activeScreen]; // If active screen = 0, display start screen
+	document.getElementById('start-screen').style.display = ["flex", "none"][activeScreen]; // If active screen = 0, display start screen
 	document.getElementById('end-screen').style.display = ["block", "none"][1^activeScreen]; // If active screen = 1, display end screen
 	
 	let overlay = document.querySelector('.overlay');
-	overlay.style.display = overlay.style.display == "block" ? "none" : "block"; // Flip display state
+	switch(window.getComputedStyle(overlay).display) {
+		case "block":
+			overlay.style.display = "none";
+			if (activeScreen == 0) disableInput = false; // Only allow input to be active if the game isn't over
+			break;
+		case "none":
+			overlay.style.display = "block";
+			disableInput = true;
+			break;
+	}
 } // Shows/hides the currently active screen (flips between display states)
 
 function selectWordle(e) {
