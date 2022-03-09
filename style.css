@@ -1,0 +1,344 @@
+@import url("https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap");
+
+/* ROOT */
+:root {
+	--grey: #292a2b;
+	--border: #272729;
+	--dark-grey: #121213;
+	--correct: #538d4e;
+	--present: #b59f3b;
+	--absent: #3a3a3c;
+	
+	font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+	background-color: var(--dark-grey)
+}
+
+p {
+	color: #ffffff;
+	padding: 12px;
+	
+	font-family: Inconsolata;
+	font-size: 20px;
+}
+
+
+/* CONTAINER */
+.container {
+	width: 400px;
+	margin: auto;
+}
+
+/* INPUT LETTERS */
+.input-letters {
+	width: 400px;
+	display: grid;
+	grid-template-columns: repeat(5, 76px);
+	column-gap: 5px;
+	row-gap: 5px;
+}
+
+.letter-box {
+	width: 70px;
+	height: 70px;
+	background-color: var(--absent);
+	border: solid 3px var(--border);
+	
+	font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
+	font-weight: bold;
+	text-align: center;
+	font-size: 58px;
+	line-height: 73px;
+	color: white;
+	
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.pop {
+	animation-name: pop;
+	animation-duration: 0.05s;
+	animation-iteration-count: 2;
+	animation-direction: alternate;
+}
+
+@keyframes pop {
+	from {transform: scale(1.0);}
+	to {transform: scale(1.3);}
+}
+
+.shake-0 {
+	animation-name: shake-0;
+	animation-duration: 0.05s;
+	animation-iteration-count: 2;
+	animation-direction: alternate;
+}
+
+.shake-1 {
+	animation-name: shake-1;
+	animation-duration: 0.05s;
+	animation-iteration-count: 2;
+	animation-direction: alternate;
+}
+
+@keyframes shake-0 {
+	0% {transform: translate(0px, 0px);}
+	50% {transform: translate(-1rem, 0px);}
+	100% {transform: translate(1rem, 0px);}
+}
+
+@keyframes shake-1 {
+	0% {transform: translate(0px, 0px);}
+	50% {transform: translate(-1rem, 0px);}
+	100% {transform: translate(1rem, 0px);}
+}
+
+/* KEYBOARD */
+.keyboard {
+	width: 400px;
+	padding: 6px 0px;
+	
+	display: flex;
+	flex-direction: column;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.row-one {
+	margin-bottom: 6px;
+}
+
+.row-three {
+	margin-top: 6px;
+}
+
+.key {
+	width: 30px;
+	height: 36px;
+	margin-left: 3px;
+	margin-right: 3px;
+	background-color: hsl(0, 0%, 95%);
+	border: solid 2px hsl(0, 0%, 60%);
+	border-radius: 6px;
+
+	font-size: 16px;
+	font-weight: bold;
+	text-align: center;
+	line-height: 38px;
+	
+	-webkit-user-select: none;
+	user-select: none;
+	cursor: pointer;
+}
+
+.dark-key {
+	color: #ffffff;
+	border: solid 2px hsl(0, 0%, 12%);
+}
+
+.key:hover {
+	background-color: hsl(0, 0%, 85%);
+	border: solid 2px hsl(0, 0%, 50%);
+}
+
+.key:active {
+	background-color: hsl(0, 0%, 70%);
+}
+
+.misc-key {
+	width: 50px;
+	font-size: 12px;
+}
+
+.material-icons {
+	font-size: 24px;
+	line-height: 36px;	
+}
+
+/* OVERLAY */
+.overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	
+	width: 100%;
+	height: 100%;
+	margin: auto;
+	background-color: rgba(100, 100, 100, 20%);
+}
+
+.screen {
+	width: 260px;
+	height: 380px;
+	position: relative;
+	margin: 110px auto;
+	background-color: #8a8b8c;
+	padding: 10px 0px;
+	
+	display: flex;
+	align-content: center;
+	flex-direction: column;
+}
+
+.button {
+	width: 240px;
+	height: 60px;
+	margin: auto;
+	background-color: #377937;
+	border-radius: 6px;
+	
+	text-align: center;
+	line-height: 62px;
+	font-size: 32px;
+	font-weight: bold;
+	color: #ffffff;
+	
+	cursor: pointer;
+}
+
+#wordle {
+	width: 240px;
+	height: 30px;
+	margin: auto;
+	
+	text-align: center;
+	font-size: 20px;
+	font-weight: bold;
+	color: #ffffff;
+}
+
+#end-screen {
+	display: none;
+}
+
+.screen-button {
+	color: #ffffff;
+	font-size: 30px;
+	
+	cursor: pointer;
+}
+
+.close-button {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+#wordle-index {
+	width: 90%;
+	height: 25%;
+	margin: 10% auto 0px;
+	
+	text-align: center;
+	font-size: 54px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+@media screen and (max-width: 620px) {
+	/* CONTAINER */
+	.container {
+		width: 250px;
+	}
+	
+	/* INPUT LETTERS */
+	.input-letters {
+		width: 250px;
+		grid-template-columns: repeat(5, 47.6px);
+		column-gap: 3px;
+		row-gap: 3px;
+	}
+	
+	.letter-box {
+		width: 41.6px;
+		height: 41.6px;
+		
+		font-size: 31.5px;
+		line-height: 41px;
+	}
+	
+	#absent-letters {
+		width: 112.5px;
+		min-height: 45px;
+		padding: 6.25px;
+	}
+
+	.absent-letter {
+		width: 16.25px;
+		height: 16.25px;
+		margin: 1.25px;
+		border: solid 1.875px var(--grey);
+
+		font-size: 14px;
+		line-height: 18px;
+	}
+	
+	.settings {
+		width: 125px;
+	}
+	
+	/* KEYBOARD */
+	.keyboard {
+		width: 250px;
+		padding: 3.75px 0px;
+	}
+	
+	.key {
+		width: 18.75px;
+		height: 22.5px;
+		margin-left: 1.875px;
+		margin-right: 1.875px;
+		
+		font-size: 8.8px;
+		line-height: 23px;
+	}
+	
+	.misc-key {
+		width: 31.25px;
+		font-size: 7.5px;
+	}
+	
+	.material-icons {
+		font-size: 13.2px;
+		line-height: 22.5px;
+	}
+	
+	/* END SCREEN */
+	#overlay {
+		width: 162.5px;
+		height: 237.5px;
+		margin: 62.5px auto;
+		padding: 6.25px 0px;
+	}
+
+	#wordle {
+		width: 150px;
+		height: 18.75px;
+		
+		font-size: 12.5px;
+	}
+
+	.button {
+		width: 150px;
+		height: 37.5px;
+
+		line-height: 37.5px;
+		font-size: 21.8px;
+	}
+}
