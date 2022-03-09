@@ -15,6 +15,10 @@
 	user-select: none;
 }
 
+*:focus {
+    outline: none;
+}
+
 body {
 	background-color: var(--dark-grey)
 }
@@ -26,7 +30,6 @@ p {
 	font-family: Inconsolata;
 	font-size: 20px;
 }
-
 
 /* CONTAINER */
 .container {
@@ -236,7 +239,6 @@ p {
 	text-align: center;
 	font-size: 54px;
 
-	outline: none;
 	border-radius: 6px;
 	border: solid 2px #2e2e2f;
 }
