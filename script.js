@@ -167,18 +167,18 @@ function guessWord(guess) {
 	let tempWordle = wordle.split(''); // Temorary wordle that we can remove letters from so that we don't count letters more than once
 	let correctIndicies = []; // List of correctly placed letter's indicies
 	for (let i = 0; i < 5; i++) {
-		if (wordle.includes(guess[i])) {
-			if (wordle[i] == guess[i]) {
-				letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--correct)"; // Color the square correct
-				colorKey(guess[i], "correct"); // Color the key with the corresponding letter correct
-				correctIndicies.push(i); // Add index to list of correct indicies
-				tempWordle.splice(tempWordle.indexOf(wordle[i]), 1); // Remove letter from temporary wordle
-			} // If the two letters are in the same place
+		if (wordle[i] == guess[i]) {
+			console.log(wordle[i], guess[i], i)
+			letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--correct)"; // Color the square correct
+			colorKey(guess[i], "correct"); // Color the key with the corresponding letter correct
+			correctIndicies.push(i); // Add index to list of correct indicies
+			tempWordle.splice(tempWordle.indexOf(wordle[i]), 1); // Remove letter from temporary wordle
 			continue; // Skip current iteration
-		} // If the current letter is in the wordle
+		} // If the two letters are in the same place
 		
 		// If the current letter is not in the wordle because we haven't skipped the current iteration
 		letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--absent)"; // Color the square absent
+		console.log(i, letterDivs[(5*guessCount)+i].style.backgroundColor)
 		colorKey(guess[i], "absent"); // Color the key with the corresponding letter absent
 	} // Check for correct and absent letters
 	
@@ -244,6 +244,7 @@ function generateEmojis() {
 
 async function share() {
 	let emojis = generateEmojis();
+	console.log(emojis)
 	try {
 		await navigator.share({
 			title: 'Sharedle',
