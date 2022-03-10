@@ -247,7 +247,7 @@ async function share() {
 	try {
 		await navigator.share({
 			title: 'Sharedle',
-			text: `I was able to solve\nSharedle #${wordleIndex}\nin ${guessCount}/6 tries!\nHow about you?\n${emojis}`,
+			text: `Sharedle ${wordleIndex} ${guessCount}/6\nTry it yourself!\n${emojis}`,
 			url: 'https://carterbryantt.github.io/Sharedle/'});
 	} catch(err) {
 		console.log(err);
