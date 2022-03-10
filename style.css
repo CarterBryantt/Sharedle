@@ -13,6 +13,8 @@
 
 	-webkit-user-select: none;
 	user-select: none;
+
+	touch-action: manipulation;
 }
 
 *:focus {
@@ -356,7 +358,7 @@ input[type=number] {
 	/* OVERLAY */
 	.screen {
 		width: 162.5px;
-		height: 237.5px;
+		height: 268.75px;
 		margin: 62.5px auto;
 		padding: 6.25px 0px;
 		row-gap: 6.25px;
