@@ -25,7 +25,8 @@ body {
 
 p {
 	color: #ffffff;
-	padding: 12px;
+	padding: 0px 12px;
+	margin: 0px;
 	
 	font-family: Inconsolata;
 	font-size: 20px;
@@ -183,14 +184,16 @@ p {
 	padding: 10px 0px;
 	
 	display: flex;
-	align-content: center;
 	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	row-gap: 10px;
 }
 
 .button {
 	width: 240px;
 	height: 60px;
-	margin: auto;
+	margin: 0px;
 	background-color: #377937;
 	border-radius: 6px;
 	
@@ -232,9 +235,9 @@ p {
 }
 
 #wordle-index {
-	width: 90%;
-	height: 25%;
-	margin: 10% auto 0px;
+	width: 70%;
+	height: 20%;
+	/* margin: 10% auto 0px; */
 	
 	text-align: center;
 	font-size: 54px;
@@ -255,10 +258,31 @@ input[type=number] {
 	-moz-appearance: textfield;
 }
 
+#select-wordle-button {
+	width: 55%;
+	height: 20px;
+	background-color: #686c70;
+	border-radius: 5px;
+
+	color: #ffffff;
+	text-align: center;
+	font-size: 16px;
+	line-height: 22px;
+
+	cursor: pointer;
+}
+
+#select-wordle-button:hover {
+	background-color: #64686d;
+}
+
+#select-wordle-button:active {
+	background-color: #5a5e62;
+}
+
 @media screen and (max-width: 620px) {
 	p {
-		padding: 7.5px;
-		
+		padding: 0px 7.5px;
 		font-size: 12.5px;
 	}
 
@@ -335,6 +359,7 @@ input[type=number] {
 		height: 237.5px;
 		margin: 62.5px auto;
 		padding: 6.25px 0px;
+		row-gap: 6.25px;
 	}
 
 	#wordle {
@@ -355,8 +380,14 @@ input[type=number] {
 	#wordle-index {
 		width: 70%;
 		height: 25%;
-		margin: 10% auto 0px;
 
 		font-size: 33.75px;
+	}
+
+	#select-wordle-button {
+		height: 12.5px;
+
+		font-size: 10px;
+		line-height: 14px;
 	}
 }

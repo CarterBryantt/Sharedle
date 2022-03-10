@@ -11,14 +11,13 @@ let guessCount = 0; // Number to keep track of how many guesses the user has mad
 let wordleIndex = Math.floor(Math.random() * wordles.length);
 let wordle = wordles[wordleIndex]; // Pick a random word from list of wordles
 document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
-console.log(wordle)
 
 let activeScreen = 0; // Tells which screen should pop up (start or end) 0 = start, 1 = end
 
 document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', showHideScreen)); // Get close screen buttons and add click event
 document.getElementById('menu-button').addEventListener('click', showHideScreen); // Get close screen buttons and add click event
 
-document.getElementById('wordle-index').addEventListener('input', selectWordle);
+document.getElementById('select-wordle-button').addEventListener('click', selectWordle);
 
 let letterDivs = document.querySelectorAll('.letter-box'); // Get letter boxes
 
@@ -28,7 +27,7 @@ for (let i = 0; i < keyDivs.length; i++) {
 	keyDivs[i].addEventListener('click', keyPress);
 } // Add event listener to all key divs to listen for mouse clicks
 
-document.getElementById('restart-button').addEventListener('click', restartGame); // Reset game when the restart button is clicked
+document.querySelectorAll('.restart-button').forEach(e => e.addEventListener('click', restartGame)); // Reset game when the restart button is clicked
 
 document.getElementById('share-button').addEventListener('click', share); // Bring up share screen to share emojis
 
@@ -92,6 +91,7 @@ function colorKey(letter, state) {
 
 let lastLength = 0;
 function updateWord() {
+	console.log("update")
 	for (let i = 0; i < 5; i++) {
 		letterDivs[(5*guessCount)+i].innerHTML = currentGuess[i] || "";
 		
@@ -130,10 +130,14 @@ function showHideScreen() {
 	}
 } // Shows/hides the currently active screen (flips between display states)
 
-function selectWordle(e) {
+function selectWordle() {
+	showHideScreen();
 	if (currentGuess > 0) return; // If the player has already started playing, exit functon
-	
-	wordleIndex = e.target.value;
+
+	wordleIndex = document.getElementById('wordle-index').value;
+
+	if (wordleIndex == "" || wordleIndex < 0 || wordleIndex >= wordles.length) return; // If the index input is empty, negative, or bigger than the list of words, exit function
+
 	wordle = wordles[wordleIndex];
 	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
 }
@@ -203,8 +207,8 @@ function restartGame() {
 	activeScreen = 0;
 	wordle = wordles[Math.floor(Math.random() * wordles.length)]; // Pick a new random word from list of wordles
 	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
-	
-	document.getElementById('end-screen').style.display = "none";
+	document.getElementById('wordle-index').value = ""; // Clear wordle index input value
+	showHideScreen();
 	
 	for (let i = 0; i < keyDivs.length; i++) {
 		if (keyDivs[i].classList.contains("dark-key")) {
@@ -222,7 +226,7 @@ function restartGame() {
 function generateEmojis() {
 	let emojis = [];
 	for (let i = 0; i < letterDivs.length; i++) {
-		if (letterDivs[i].innerHTML = "") break; // If there isn't a letter, exit for loop
+		if (letterDivs[i].innerHTML == "") break; // If there isn't a letter, exit for loop
 		switch(letterDivs[i].style.backgroundColor) {
 			case "var(--absent)":
 				emojis += i % 5 != 4 ? "\u2B1B" : "\u2B1B\n"; // ⬛
@@ -240,11 +244,10 @@ function generateEmojis() {
 
 async function share() {
 	let emojis = generateEmojis();
-	console.log(emojis)
 	try {
 		await navigator.share({
-			title: 'Wordle',
-			text: `I was able to solve\nWordle #${wordleIndex}\nin ${guessCount}/6 tries!\nHow about you?\n${emojis}`,
+			title: 'Sharedle',
+			text: `I was able to solve\nSharedle #${wordleIndex}\nin ${guessCount}/6 tries!\nHow about you?\n${emojis}`,
 			url: 'https://carterbryantt.github.io/Sharedle/'});
 	} catch(err) {
 		console.log(err);
