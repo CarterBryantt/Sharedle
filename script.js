@@ -132,7 +132,7 @@ function showHideScreen() {
 
 function selectWordle() {
 	showHideScreen();
-	if (currentGuess > 0) return; // If the player has already started playing, exit functon
+	if (guessCount > 0) return; // If the player has already started playing, exit functon
 
 	wordleIndex = document.getElementById('wordle-index').value;
 
