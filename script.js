@@ -179,6 +179,24 @@ function displayError(error) {
 	errorContainer.insertBefore(popup, errorContainer.firstChild);
 }
 
+function colorBox(box, color) {
+	box.style.backgroundColor = color;
+	box.style.borderColor = color;
+}
+
+function flipCell(colors, i, row) {
+	let letterBox = letterDivs[(5*row)+i];
+	letterBox.classList.remove('pop'); // Remove pop class so it doesn't interfere with animation
+
+	letterBox.addEventListener("animationiteration", colorBox(letterBox, colors[i])); // After the letter box has completed one iteration of the animation (It's exactly flat), change its color
+	letterBox.addEventListener("animationend", () => {
+		letterBox.classList.remove('flip');
+		if (i < 4) flipCell(colors, i+1, 0); // Flip next letter box
+	});
+
+	letterBox.classList.add('flip'); // Start animation
+}
+
 // ------------------------------------------------------------------------
 // ALGORITHM
 // ------------------------------------------------------------------------
@@ -203,32 +221,38 @@ function guessWord(guess) {
 		return;
 	} // If the guess is the wordle, the player wins
 	
+	let boxColors = new Array(5); // Array that holds all the cells colors
 	let tempWordle = wordle.split(''); // Temorary wordle that we can remove letters from so that we don't count letters more than once
 	let correctIndicies = []; // List of correctly placed letter's indicies
 	for (let i = 0; i < 5; i++) {
 		if (wordle[i] == guess[i]) {
 			console.log(wordle[i], guess[i], i)
-			letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--correct)"; // Color the square correct
-			letterDivs[(5*guessCount)+i].style.borderColor = "var(--correct)"; // Color border correct
+			boxColors[i] = "var(--correct)"; // Set square color to correct
+			// letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--correct)"; // Color the square correct
+			// letterDivs[(5*guessCount)+i].style.borderColor = "var(--correct)"; // Color border correct
 			correctIndicies.push(i); // Add index to list of correct indicies
 			tempWordle.splice(tempWordle.indexOf(wordle[i]), 1); // Remove letter from temporary wordle
 			continue; // Skip current iteration
 		} // If the two letters are in the same place
 		
 		// If the current letter is not in the wordle because we haven't skipped the current iteration
-		letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--absent)"; // Color the square absent
-		letterDivs[(5*guessCount)+i].style.borderColor = "var(--absent)"; // Color border absent
+		boxColors[i] = "var(--absent)"; // Set square color to absent
+		// letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--absent)"; // Color the square absent
+		// letterDivs[(5*guessCount)+i].style.borderColor = "var(--absent)"; // Color border absent
 		colorKey(guess[i], "absent"); // Color the key with the corresponding letter absent
 	} // Check for correct and absent letters
 	
 	for (let i = 0; i < 5; i++) {
 		if (tempWordle.includes(guess[i]) && !correctIndicies.includes(i)) {
-			letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--present)"; // Color the square present
-			letterDivs[(5*guessCount)+i].style.borderColor = "var(--present)"; // Color border present
+			boxColors[i] = "var(--present)"; // Set square color to present
+			// letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--present)"; // Color the square present
+			// letterDivs[(5*guessCount)+i].style.borderColor = "var(--present)"; // Color border present
 			colorKey(guess[i], "present"); // Color the key with the corresponding letter absent
 			tempWordle.splice(tempWordle.indexOf(guess[i]), 1); // Remove letter from temporary wordle
 		} // If the current letter is in the wordle and the current index isn't a letter that is already correctly placed
 	} // Check for present letters
+
+	flipCell(boxColors, 0, guessCount); // Flip first cell
 	
 	if (guessCount == 5) {
 		activeScreen = 1;

@@ -63,6 +63,19 @@ p {
 	color: white;
 }
 
+.flip {
+	animation-name: flip-box;
+	animation-duration: 0.25s;
+	animation-direction: alternate;
+	animation-iteration-count: 2;
+	animation-timing-function: linear;
+}
+
+@keyframes flip-box {
+	from { transform: rotateX(0deg); }
+	to { transform: rotateX(90deg); }
+}
+
 .pop {
 	animation-name: pop;
 	animation-duration: 0.05s;
@@ -212,6 +225,20 @@ p {
 	color: #ffffff;
 	
 	cursor: pointer;
+
+	outline: solid 0px;
+	transform: translateY(0);
+	transition: outline 0.05s, transform 0.1s;
+}
+
+.button:hover {
+	outline: solid;
+	transition: outline 0.1s;
+}
+
+.button:active {
+	transform: translateY(2px);
+	transition: outline 0.1s, transform 0.1s;
 }
 
 #wordle {
@@ -269,7 +296,7 @@ input[type=number] {
 #select-wordle-button {
 	width: 55%;
 	height: 20px;
-	background-color: #686c70;
+	background-color: #52575c;
 	border-radius: 5px;
 
 	color: #ffffff;
@@ -281,11 +308,11 @@ input[type=number] {
 }
 
 #select-wordle-button:hover {
-	background-color: #64686d;
+	background-color: #4b4f53;
 }
 
 #select-wordle-button:active {
-	background-color: #5a5e62;
+	background-color: #414447;
 }
 
 /* ERROR DISPLAY */
