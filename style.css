@@ -183,6 +183,12 @@ p {
 	position: relative;
 	margin: 110px auto;
 	background-color: #8a8b8c;
+	/* box-shadow: 5px 5px #57585c; */
+	/* border-width: 0 5px 5px 0;
+	border-style: inset;
+	border-color: #57585c; */
+	border: inset 5px #47484e;
+	border-radius: 12px;
 	padding: 10px 0px;
 	
 	display: flex;
