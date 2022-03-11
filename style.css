@@ -2,8 +2,9 @@
 
 /* ROOT */
 :root {
+	--border-light: #616166;
+	--border-dark: #272729;
 	--grey: #292a2b;
-	--border: #272729;
 	--dark-grey: #121213;
 	--correct: #538d4e;
 	--present: #b59f3b;
@@ -52,8 +53,7 @@ p {
 .letter-box {
 	width: 70px;
 	height: 70px;
-	background-color: var(--absent);
-	border: solid 3px var(--border);
+	border: solid 3px var(--border-dark);
 	
 	font-family: 'Clear Sans', 'Helvetica Neue', Arial, sans-serif;
 	font-weight: bold;
@@ -280,6 +280,40 @@ input[type=number] {
 
 #select-wordle-button:active {
 	background-color: #5a5e62;
+}
+
+/* ERROR DISPLAY */
+.error-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	row-gap: 10px;
+
+	pointer-events: none;
+	background-color: transparent;
+}
+
+.popup {
+	width: 150px;
+	height: 50px;
+	border-radius: 12px;
+	background-color: #ffffff;
+
+	color: #121213;
+	text-align: center;
+	font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+	line-height: 50px;
+}
+
+.popup:nth-child(1) {
+	margin-top: 5%;
+}
+
+.fade-out {
+	opacity: 0;
+	transition: opacity 0.2s linear; /* wait til div is completely transparent, then hide */
 }
 
 @media screen and (max-width: 620px) {

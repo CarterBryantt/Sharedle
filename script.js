@@ -91,9 +91,10 @@ function colorKey(letter, state) {
 
 let lastLength = 0;
 function updateWord() {
-	console.log("update")
 	for (let i = 0; i < 5; i++) {
 		letterDivs[(5*guessCount)+i].innerHTML = currentGuess[i] || "";
+
+		letterDivs[(5*guessCount)+i].style.borderColor = currentGuess[i] ? "var(--border-light)" : "var(--border-dark)"; // If theres a letter in the letter box, color the border light
 		
 		// Box animation
 		if (currentGuess.length > lastLength) {
@@ -140,6 +141,42 @@ function selectWordle() {
 
 	wordle = wordles[wordleIndex];
 	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
+} // Changes the current wordle to the wordle at the inputted index
+
+function getBrowserTransitionEvent() {
+	let temp = document.createElement('temp'); // Create temporary element
+	let transitionEvents = {
+		'transition':'transitionend',
+    	'OTransition':'oTransitionEnd',
+		'MozTransition':'transitionend',
+		'WebkitTransition':'webkitTransitionEnd'
+	} // Key value pairs that hold browser-specific transition css values and their corresponding browser-specific transition event
+
+	for (let transition in transitionEvents) {
+		if (temp.style[transition] !== undefined) {
+			temp.remove();
+			return transitionEvents[transition];
+		} // If the value exist, return the corresponding transition event
+	}
+} // Gets browser-specific transition end event
+
+let popups = [];
+function addTransitionDelay(el, delay) {
+	setTimeout(() => { 
+		if (popups[popups.length-1] == el) el.classList.add('fade-out'); 
+	}, delay*1000); // If this div is the last error message, begin fade out
+}
+
+function displayError(error) {
+	let popup = document.createElement('div');
+	popup.classList.add('popup');
+	popup.innerHTML = error;
+
+	popup.addEventListener('transitionend', () => { popup.remove() });
+	setTimeout(() => { popup.classList.add('fade-out'); }, 1000);
+
+	let errorContainer = document.querySelector('.error-container')
+	errorContainer.insertBefore(popup, errorContainer.firstChild);
 }
 
 // ------------------------------------------------------------------------
@@ -152,6 +189,7 @@ function guessWord(guess) {
 			letterDivs[(5*guessCount)+i].classList.remove(`shake-${1^flip}`);
 			letterDivs[(5*guessCount)+i].classList.add(`shake-${flip}`);
 		}
+		displayError("Not a valid word");
 		return;
 	}; // If guess is not a valid word, shake letters and exit function
 	
@@ -162,6 +200,7 @@ function guessWord(guess) {
 		activeScreen = 1;
 		showHideScreen();
 		disableInput = true;
+		return;
 	} // If the guess is the wordle, the player wins
 	
 	let tempWordle = wordle.split(''); // Temorary wordle that we can remove letters from so that we don't count letters more than once
@@ -170,7 +209,7 @@ function guessWord(guess) {
 		if (wordle[i] == guess[i]) {
 			console.log(wordle[i], guess[i], i)
 			letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--correct)"; // Color the square correct
-			colorKey(guess[i], "correct"); // Color the key with the corresponding letter correct
+			letterDivs[(5*guessCount)+i].style.borderColor = "var(--correct)"; // Color border correct
 			correctIndicies.push(i); // Add index to list of correct indicies
 			tempWordle.splice(tempWordle.indexOf(wordle[i]), 1); // Remove letter from temporary wordle
 			continue; // Skip current iteration
@@ -178,13 +217,14 @@ function guessWord(guess) {
 		
 		// If the current letter is not in the wordle because we haven't skipped the current iteration
 		letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--absent)"; // Color the square absent
-		console.log(i, letterDivs[(5*guessCount)+i].style.backgroundColor)
+		letterDivs[(5*guessCount)+i].style.borderColor = "var(--absent)"; // Color border absent
 		colorKey(guess[i], "absent"); // Color the key with the corresponding letter absent
 	} // Check for correct and absent letters
 	
 	for (let i = 0; i < 5; i++) {
 		if (tempWordle.includes(guess[i]) && !correctIndicies.includes(i)) {
-			letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--present)"; // Color the square correct
+			letterDivs[(5*guessCount)+i].style.backgroundColor = "var(--present)"; // Color the square present
+			letterDivs[(5*guessCount)+i].style.borderColor = "var(--present)"; // Color border present
 			colorKey(guess[i], "present"); // Color the key with the corresponding letter absent
 			tempWordle.splice(tempWordle.indexOf(guess[i]), 1); // Remove letter from temporary wordle
 		} // If the current letter is in the wordle and the current index isn't a letter that is already correctly placed
@@ -194,6 +234,7 @@ function guessWord(guess) {
 		activeScreen = 1;
 		showHideScreen();
 		disableInput = true;
+		return;
 	} // This was the player's last guess and they didn't win
 	
 	guessCount++; // Increase number of guesses made
@@ -219,7 +260,8 @@ function restartGame() {
 	
 	for (let i = 0; i < letterDivs.length; i++) {
 		letterDivs[i].innerHTML = "";
-		letterDivs[i].style.backgroundColor = "var(--absent)";
+		letterDivs[i].style.backgroundColor = "";
+		letterDivs[(5*guessCount)+i].style.borderColor = "var(--border-dark)";
 	} // Clear letter boxes
 }
 
@@ -248,7 +290,7 @@ async function share() {
 	try {
 		await navigator.share({
 			title: 'Sharedle',
-			text: `Sharedle ${wordleIndex} ${guessCount}/6\nTry it yourself!\n${emojis}`,
+			text: `Sharedle ${wordleIndex} ${guessCount+1}/6\nTry it yourself!\n${emojis}`,
 			url: 'https://carterbryantt.github.io/Sharedle/'});
 	} catch(err) {
 		console.log(err);
