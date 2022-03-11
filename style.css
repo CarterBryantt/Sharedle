@@ -308,7 +308,7 @@ input[type=number] {
 }
 
 .popup:nth-child(1) {
-	margin-top: 5%;
+	margin-top: 50px;
 }
 
 .fade-out {
@@ -425,5 +425,23 @@ input[type=number] {
 
 		font-size: 10px;
 		line-height: 14px;
+	}
+
+	/* ERROR DISPLAY */
+	.error-container {
+		row-gap: 6.25px;
+	}
+
+	.popup {
+		width: 93.75px;
+		height: 31.25px;
+		border-radius: 7.5px;
+
+		font-size: 12.5px;
+		line-height: 31.25px;
+	}
+
+	.popup:nth-child(1) {
+		margin-top: 33px;
 	}
 }
