@@ -191,7 +191,7 @@ function flipCell(colors, i, row) {
 	letterBox.addEventListener("animationiteration", colorBox(letterBox, colors[i])); // After the letter box has completed one iteration of the animation (It's exactly flat), change its color
 	letterBox.addEventListener("animationend", () => {
 		letterBox.classList.remove('flip');
-		if (i < 4) flipCell(colors, i+1, row+1); // Flip next letter box
+		if (i < 4) flipCell(colors, i+1, row); // Flip next letter box
 	});
 
 	letterBox.classList.add('flip'); // Start animation
