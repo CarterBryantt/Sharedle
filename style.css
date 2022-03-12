@@ -196,10 +196,6 @@ p {
 	position: relative;
 	margin: 110px auto;
 	background-color: #707375;
-	/* box-shadow: 5px 5px #57585c; */
-	/* border-width: 0 5px 5px 0;
-	border-style: inset;
-	border-color: #57585c; */
 	border: inset 5px #47484e;
 	border-radius: 12px;
 	padding: 10px 0px;
@@ -315,8 +311,8 @@ input[type=number] {
 	background-color: #414447;
 }
 
-/* ERROR DISPLAY */
-.error-container {
+/* MESSAGE DISPLAY */
+.message-container {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -327,8 +323,7 @@ input[type=number] {
 }
 
 .popup {
-	width: 192px;
-	height: 50px;
+	padding: 10px;
 	border-radius: 12px;
 	background-color: #ffffff;
 
@@ -337,7 +332,6 @@ input[type=number] {
 	font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 	font-weight: bold;
 	font-size: 20px;
-	line-height: 50px;
 }
 
 .popup:nth-child(1) {
@@ -460,18 +454,16 @@ input[type=number] {
 		line-height: 14px;
 	}
 
-	/* ERROR DISPLAY */
-	.error-container {
+	/* MESSAGE DISPLAY */
+	.message-container {
 		row-gap: 6.25px;
 	}
 
 	.popup {
-		width: 120px;
-		height: 31.25px;
+		padding: 6.25px;
 		border-radius: 7.5px;
 
 		font-size: 12.5px;
-		line-height: 31.25px;
 	}
 
 	.popup:nth-child(1) {

@@ -58,7 +58,7 @@ function keyPress(e) {
 
 		if (key == "Backspace" && currentGuess.length != 0) currentGuess = currentGuess.slice(0, -1); // If there is at least one letter, delete the last letter in the current guess
 		
-		if (key == "Enter" && currentGuess.length == 5) guessWord(currentGuess.toLowerCase()); // If there are at least five letters, enter word
+		if (!e.repeat && key == "Enter" && currentGuess.length == 5) guessWord(currentGuess.toLowerCase()); // If the key is not being held down there are at least five letters, enter word
 
 		if (currentGuess.length != 5 && key != "Enter" && key != "Backspace") currentGuess += key.slice(3); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
 
@@ -143,16 +143,16 @@ function selectWordle() {
 	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
 } // Changes the current wordle to the wordle at the inputted index
 
-function displayError(error) {
+function displayMessage(message) {
 	let popup = document.createElement('div');
 	popup.classList.add('popup');
-	popup.innerHTML = error;
+	popup.innerHTML = message;
 
 	popup.addEventListener('transitionend', () => { popup.remove() });
 	setTimeout(() => { popup.classList.add('fade-out'); }, 1000);
 
-	let errorContainer = document.querySelector('.error-container')
-	errorContainer.insertBefore(popup, errorContainer.firstChild);
+	let messageContainer = document.querySelector('.message-container')
+	messageContainer.insertBefore(popup, messageContainer.firstChild);
 }
 
 function colorBox(box, color) {
@@ -197,7 +197,7 @@ function guessWord(guess) {
 			letterDivs[(5*guessCount)+i].classList.remove(`shake-${1^flip}`);
 			letterDivs[(5*guessCount)+i].classList.add(`shake-${flip}`);
 		}
-		displayError("Not a valid word");
+		displayMessage("Not a valid word");
 		return;
 	}; // If guess is not a valid word, shake letters and exit function
 	
@@ -250,7 +250,8 @@ function restartGame() {
 	disableInput = false;
 	activeScreen = 0;
 
-	wordle = wordles[Math.floor(Math.random() * wordles.length)]; // Pick a new random word from list of wordles
+	wordleIndex = Math.floor(Math.random() * wordles.length); // Pick a new random word from list of wordles
+	wordle = wordles[wordleIndex];
 	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
 	document.getElementById('wordle-index').value = ""; // Clear wordle index input value
 	showHideScreen();
@@ -294,7 +295,8 @@ async function share() {
 		await navigator.share({
 			title: 'Sharedle',
 			text: `Sharedle ${wordleIndex} ${guessCount+1}/6\nTry it yourself!\n${emojis}`,
-			url: 'https://carterbryantt.github.io/Sharedle/'});
+			url: 'https://carterbryantt.github.io/Sharedle/'
+		});
 	} catch(err) {
 		console.log(err);
 	}
