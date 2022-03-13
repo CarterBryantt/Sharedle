@@ -1,5 +1,9 @@
 import {byDate as wordles, valid as validWords, all as allWords, futureWords} from "./word-lists.js"; // Import all word lists from word list file
 
+// window.onload = () => {
+
+// }
+
 // ------------------------------------------------------------------------
 // INPUT
 // ------------------------------------------------------------------------
@@ -13,6 +17,8 @@ let wordle = wordles[wordleIndex]; // Pick a random word from list of wordles
 document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
 
 let activeScreen = 0; // Tells which screen should pop up (start or end) 0 = start, 1 = end
+
+let lastLength = 0; // Last currentWord length; variable used in `update` function
 
 document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', showHideScreen)); // Get close screen buttons and add click event
 document.getElementById('menu-button').addEventListener('click', showHideScreen); // Get close screen buttons and add click event
@@ -33,6 +39,8 @@ document.getElementById('share-button').addEventListener('click', share); // Bri
 
 document.addEventListener('keydown', keyPress); // Add event listener to the document to listen for keypresses
 
+fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
+
 function keyPress(e) {
 	if (disableInput || document.activeElement == document.getElementById('password')) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
 	
@@ -43,13 +51,13 @@ function keyPress(e) {
 			if (keyDiv.id == "backspace" && currentGuess.length != 0) currentGuess = currentGuess.slice(0, -1); // Check if the key pressed is the backspace key, if it is, remove the last letter from the word. Also make sure there is at least 1 letter in the current guess
 
 			if (keyDiv.innerHTML == "ENTER" && currentGuess.length == 5) guessWord(currentGuess.toLowerCase()); // Check if the key pressed is the enter key, if it is, run the search algorithm on the word. Also check if the current guess is at least 5 letters long
-			updateWord(); // Display new word
+			updateWord(currentGuess, guessCount); // Display new word
 			return;
 		} // Check if key pressed is a miscellaneous key or if it is the backspace icon, if it is don't add text to input word
 
 		if (currentGuess.length != 5) currentGuess += keyDiv.innerHTML; // If current guess is not already five letters long and the div key pressed is a letter, add the letter to the current guess
 
-		updateWord(); // Display new word
+		updateWord(currentGuess, guessCount); // Display new word
 	} // If the event that triggered the function is a click event
 	if (e.type == "keydown") {
 		let key = e.code; // Get key pressed
@@ -62,7 +70,7 @@ function keyPress(e) {
 
 		if (currentGuess.length != 5 && key != "Enter" && key != "Backspace") currentGuess += key.slice(3); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
 
-		if (guessCount != 6) updateWord(); // Display new word
+		if (guessCount != 6) updateWord(currentGuess, guessCount); // Display new word
 	} // If the event that triggered the function is a keypress event
 } // Register key presses from keyboard and update word
 
@@ -89,29 +97,28 @@ function colorKey(letter, state) {
 	}
 } // Color keyboard key a given state color
 
-let lastLength = 0;
-function updateWord() {
+function updateWord(guess, row) {
 	for (let i = 0; i < 5; i++) {
-		letterDivs[(5*guessCount)+i].innerHTML = currentGuess[i] || "";
+		letterDivs[(5*row)+i].innerHTML = guess[i] || "";
 
-		letterDivs[(5*guessCount)+i].style.borderColor = currentGuess[i] ? "var(--border-light)" : "var(--border-dark)"; // If theres a letter in the letter box, color the border light
+		letterDivs[(5*row)+i].style.borderColor = guess[i] ? "var(--border-light)" : "var(--border-dark)"; // If theres a letter in the letter box, color the border light
 		
 		// Box animation
-		if (currentGuess.length > lastLength) {
-			letterDivs[(5*guessCount)+lastLength].classList.add("pop");
-		} else if (currentGuess != 5) {
+		if (guess.length > lastLength) {
+			letterDivs[(5*row)+lastLength].classList.add("pop");
+		} else if (guess != 5) {
 			for (let i = 0; i < 5; i++) {
-				letterDivs[(5*guessCount)+i].classList.remove("pop");
+				letterDivs[(5*row)+i].classList.remove("pop");
 			}
 		} // If the word gained a letter, add animation class to letter box, else, remove it
 		
 		// Remove shake animation
-		if (currentGuess.length < lastLength) {
-			letterDivs[(5*guessCount)+i].classList.remove("shake-0"); 
-			letterDivs[(5*guessCount)+i].classList.remove("shake-1");
+		if (guess.length < lastLength) {
+			letterDivs[(5*row)+i].classList.remove("shake-0"); 
+			letterDivs[(5*row)+i].classList.remove("shake-1");
 		} // If the letter box has the shake class and the word is shrinking in length, remove it
 	} // If the letter box has the shake class and decreased in length, remove the class
-	lastLength = currentGuess.length;
+	lastLength = guess.length;
 } // Update word using key presses
 
 function showHideScreen() {
@@ -139,8 +146,8 @@ function selectWordle() {
 
 	if (wordleIndex == "" || wordleIndex < 0 || wordleIndex >= wordles.length) return; // If the index input is empty, negative, or bigger than the list of words, exit function
 
-	wordle = wordles[wordleIndex];
-	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
+	localStorage.setItem('solution-index', JSON.stringify(wordleIndex)); // Index of the sharedle the player has to guess
+	changeSolution(wordleIndex);
 } // Changes the current wordle to the wordle at the inputted index
 
 function displayMessage(message) {
@@ -160,7 +167,7 @@ function colorBox(box, color) {
 	box.style.borderColor = color;
 }
 
-function flipBox(colors, i, row) {
+function flipBox(colors, i, row, flipQuickly = false) {
 	let letterBox = letterDivs[(5*row)+i];
 	letterBox.classList.remove('pop'); // Remove pop class so it doesn't interfere with animation
 
@@ -172,13 +179,13 @@ function flipBox(colors, i, row) {
 		letterBox.removeEventListener("animationiteration", tempOne);
 		letterBox.removeEventListener("animationend", tempTwo);
 		letterBox.classList.remove('flip');
-		if (i < 4) {
+		if (i < 4 && !flipQuickly) {
 			flipBox(colors, i+1, row); 
 		} else {
 			for (let j = 0; j < 5; j++) {
 				colorKey(colorKey(letterDivs[(5*row)+j].innerHTML, colors[j]));
 			}
-		}// Flip next letter box unless this is the last letter box, after all boxes are filled, color keys
+		} // Flip next letter box unless this is the last letter box or we are flipping the boxes quickly, after all boxes are filled, color keys
 	};
 
 	letterBox.addEventListener("animationiteration", tempOne); // After the letter box has completed one iteration of the animation (It's exactly flat), change its color
@@ -187,6 +194,16 @@ function flipBox(colors, i, row) {
 	letterBox.classList.add('flip'); // Start animation
 }
 
+function quickFlip(colors, row, interval) {
+	for (let i = 0; i < 5; i++) {
+		setInterval(flipBox(colors, i, row, true), interval*i);
+	} // Flip letters with a gap equal to interval
+}
+
+function changeSolution(index) {
+	wordle = wordles[index]; // Pick a random word from list of wordles
+	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
+}
 // ------------------------------------------------------------------------
 // ALGORITHM
 // ------------------------------------------------------------------------
@@ -199,15 +216,15 @@ function guessWord(guess) {
 		}
 		displayMessage("Not a valid word");
 		return;
-	}; // If guess is not a valid word, shake letters and exit function
+	} // If guess is not a valid word, shake letters and exit function
 	
-	if (guess == wordle) {
-		activeScreen = 1;
-		disableInput = true;
-		flipBox(new Array(5).fill("var(--correct)"), 0, guessCount); // Color squares correct
-		setTimeout(showHideScreen, 3000); // Wait til all letters have flipped before showing end screen
-		return;
-	} // If the guess is the wordle, the player wins
+	// if (guess == wordle) {
+	// 	activeScreen = 1;
+	// 	disableInput = true;
+	// 	flipBox(new Array(5).fill("var(--correct)"), 0, guessCount); // Color squares correct
+	// 	setTimeout(showHideScreen, 3000); // Wait til all letters have flipped before showing end screen
+	// 	return;
+	// } // If the guess is the wordle, the player wins
 	
 	let boxColors = new Array(5); // Array that holds all the cells colors
 	let tempWordle = wordle.split(''); // Temorary wordle that we can remove letters from so that we don't count letters more than once
@@ -231,20 +248,23 @@ function guessWord(guess) {
 		} // If the current letter is in the wordle and the current index isn't a letter that is already correctly placed
 	} // Check for present letters
 
+	updateStorage(guess, boxColors); // Update local storage
 	flipBox(boxColors, 0, guessCount); // Flip first box
-	
-	if (guessCount == 5) {
+
+	if (guessCount == 5 || guess == wordle) {
 		activeScreen = 1;
 		disableInput = true;
-		showHideScreen();
+		setTimeout(showHideScreen, 3000); // Wait til all letters have flipped before showing end screen
 		return;
 	} // This was the player's last guess and they didn't win
-	
+
 	guessCount++; // Increase number of guesses made
 	currentGuess = ""; // Clear current guess
 }
 
 function restartGame() {
+	localStorage.clear();
+
 	guessCount = 0;
 	currentGuess = "";
 	disableInput = false;
@@ -255,6 +275,8 @@ function restartGame() {
 	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
 	document.getElementById('wordle-index').value = ""; // Clear wordle index input value
 	showHideScreen();
+
+	initStorage();
 	
 	for (let i = 0; i < keyDivs.length; i++) {
 		if (keyDivs[i].classList.contains("dark-key")) {
@@ -266,7 +288,7 @@ function restartGame() {
 	for (let i = 0; i < letterDivs.length; i++) {
 		letterDivs[i].innerHTML = "";
 		letterDivs[i].style.backgroundColor = "";
-		letterDivs[(5*guessCount)+i].style.borderColor = "var(--border-dark)";
+		letterDivs[i].style.borderColor = "var(--border-dark)";
 	} // Clear letter boxes
 }
 
@@ -299,5 +321,52 @@ async function share() {
 		});
 	} catch(err) {
 		console.log(err);
+	}
+}
+
+// ------------------------------------------------------------------------
+// LOCAL STORAGE
+// ------------------------------------------------------------------------
+function initStorage() {
+	if (localStorage.getItem('guessed-words') === null) {
+		localStorage.setItem('guessed-words', JSON.stringify(new Array(6).fill(""))); // List of guessed words
+		localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
+		localStorage.setItem('current-row', "0"); // Number indicating the row the player is currently on
+		localStorage.setItem('solution-index', JSON.stringify(wordleIndex)); // Index of the sharedle the player has to guess
+	}
+	console.log(localStorage)
+}
+
+function updateStorage(guess, states) {
+	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
+	let wordStates = JSON.parse(localStorage.getItem('word-states'));
+
+	guessedWords[guessCount] = guess;
+	wordStates[guessCount] = states;
+	
+	localStorage.setItem('guessed-words', JSON.stringify(guessedWords));
+	localStorage.setItem('word-states', JSON.stringify(wordStates));
+	localStorage.setItem('current-row', JSON.stringify(guessCount+1));
+}
+
+function fillInGuesses() {
+	if (localStorage.getItem('guessed-words') === null) {
+		initStorage();
+		return;
+	} // If starting values aren't defined, initialize them and exit function
+	
+	// -----------------------------------------
+	// EXECUTES ONLY IF GAME IS ALREADY GOING ON
+	// -----------------------------------------
+	console.log("Filling", localStorage)
+	guessCount = JSON.parse(localStorage.getItem('current-row'));
+
+	changeSolution(JSON.parse(localStorage.getItem('solution-index')));
+
+	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
+	let wordStates = JSON.parse(localStorage.getItem('word-states'));
+	for (let i = 0; i < guessedWords.length; i++) {
+		updateWord(guessedWords[i].toUpperCase(), i);
+		quickFlip(wordStates[i], i, 200);
 	}
 }
