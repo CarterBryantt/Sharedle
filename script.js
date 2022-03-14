@@ -12,7 +12,8 @@ let disableInput = true;
 let currentGuess = ""; // String to keep track of the current word being input
 let guessCount = 0; // Number to keep track of how many guesses the user has made
 
-let wordleIndex = Math.floor(Math.random() * wordles.length);
+let urlIndex = new URLSearchParams(window.location.search).get('index'); // Get index from search params
+let wordleIndex = urlIndex || Math.floor(Math.random() * wordles.length); // Make wordleIndex urlIndex if a urlIndex was provided, otherwise generate a random index
 let wordle = wordles[wordleIndex]; // Pick a random word from list of wordles
 document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
 
@@ -23,7 +24,7 @@ let lastLength = 0; // Last currentWord length; variable used in `update` functi
 document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', showHideScreen)); // Get close screen buttons and add click event
 document.getElementById('menu-button').addEventListener('click', showHideScreen); // Get close screen buttons and add click event
 
-document.getElementById('select-wordle-button').addEventListener('click', selectWordle);
+// document.getElementById('select-wordle-button').addEventListener('click', selectWordle);
 
 let letterDivs = document.querySelectorAll('.letter-box'); // Get letter boxes
 
@@ -138,17 +139,17 @@ function showHideScreen() {
 	}
 } // Shows/hides the currently active screen (flips between display states)
 
-function selectWordle() {
-	showHideScreen();
-	if (guessCount > 0) return; // If the player has already started playing, exit functon
+// function selectWordle() {
+// 	showHideScreen();
+// 	if (guessCount > 0) return; // If the player has already started playing, exit functon
 
-	wordleIndex = document.getElementById('wordle-index').value;
+// 	wordleIndex = document.getElementById('wordle-index').value;
 
-	if (wordleIndex == "" || wordleIndex < 0 || wordleIndex >= wordles.length) return; // If the index input is empty, negative, or bigger than the list of words, exit function
+// 	if (wordleIndex == "" || wordleIndex < 0 || wordleIndex >= wordles.length) return; // If the index input is empty, negative, or bigger than the list of words, exit function
 
-	localStorage.setItem('solution-index', JSON.stringify(wordleIndex)); // Index of the sharedle the player has to guess
-	changeSolution(wordleIndex);
-} // Changes the current wordle to the wordle at the inputted index
+// 	localStorage.setItem('solution-index', JSON.stringify(wordleIndex)); // Index of the sharedle the player has to guess
+// 	changeSolution(wordleIndex);
+// } // Changes the current wordle to the wordle at the inputted index
 
 function displayMessage(message) {
 	let popup = document.createElement('div');
@@ -317,7 +318,7 @@ async function share() {
 		await navigator.share({
 			title: 'Sharedle',
 			text: `Sharedle ${wordleIndex} ${guessCount+1}/6\nTry it yourself!\n${emojis}`,
-			url: 'https://carterbryantt.github.io/Sharedle/'
+			url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`
 		});
 	} catch(err) {
 		console.log(err);
@@ -328,13 +329,11 @@ async function share() {
 // LOCAL STORAGE
 // ------------------------------------------------------------------------
 function initStorage() {
-	if (localStorage.getItem('guessed-words') === null) {
-		localStorage.setItem('guessed-words', JSON.stringify(new Array(6).fill(""))); // List of guessed words
-		localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
-		localStorage.setItem('current-row', "0"); // Number indicating the row the player is currently on
-		localStorage.setItem('solution-index', JSON.stringify(wordleIndex)); // Index of the sharedle the player has to guess
-	}
-	console.log(localStorage)
+	localStorage.setItem('guessed-words', JSON.stringify(new Array(6).fill(""))); // List of guessed words
+	localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
+	localStorage.setItem('current-row', "0"); // Number indicating the row the player is currently on
+	localStorage.setItem('solution-index', wordleIndex); // Index of the sharedle the player has to guess
+	console.log(localStorage, wordleIndex)
 }
 
 function updateStorage(guess, states) {
@@ -350,15 +349,16 @@ function updateStorage(guess, states) {
 }
 
 function fillInGuesses() {
-	if (localStorage.getItem('guessed-words') === null) {
+	let hasIndexChanged = urlIndex !== null && urlIndex != JSON.parse(localStorage.getItem('solution-index'));
+
+	if (localStorage.getItem('guessed-words') === null || hasIndexChanged) {
 		initStorage();
 		return;
-	} // If starting values aren't defined, initialize them and exit function
+	} // If starting values aren't defined or the game index has changed, initialize them and exit function
 	
 	// -----------------------------------------
 	// EXECUTES ONLY IF GAME IS ALREADY GOING ON
 	// -----------------------------------------
-	console.log("Filling", localStorage)
 	guessCount = JSON.parse(localStorage.getItem('current-row'));
 
 	changeSolution(JSON.parse(localStorage.getItem('solution-index')));
