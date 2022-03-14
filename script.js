@@ -7,7 +7,7 @@ import {byDate as wordles, valid as validWords, all as allWords, futureWords} fr
 // ------------------------------------------------------------------------
 // INPUT
 // ------------------------------------------------------------------------
-let disableInput = true;
+let disableInput = false;
 
 let currentGuess = ""; // String to keep track of the current word being input
 let guessCount = 0; // Number to keep track of how many guesses the user has made
@@ -123,8 +123,9 @@ function updateWord(guess, row) {
 } // Update word using key presses
 
 function showHideScreen() {
-	document.getElementById('start-screen').style.display = ["flex", "none"][activeScreen]; // If active screen = 0, display start screen
+	// document.getElementById('start-screen').style.display = ["flex", "none"][activeScreen]; // If active screen = 0, display start screen
 	document.getElementById('end-screen').style.display = ["flex", "none"][1^activeScreen]; // If active screen = 1, display end screen
+	console.log(["flex", "none"][1^activeScreen])
 
 	let overlay = document.querySelector('.overlay');
 	switch(window.getComputedStyle(overlay).display) {
@@ -253,6 +254,7 @@ function guessWord(guess) {
 	flipBox(boxColors, 0, guessCount); // Flip first box
 
 	if (guessCount == 5 || guess == wordle) {
+		console.log("s")
 		activeScreen = 1;
 		disableInput = true;
 		setTimeout(showHideScreen, 3000); // Wait til all letters have flipped before showing end screen
@@ -318,7 +320,8 @@ async function share() {
 		await navigator.share({
 			title: 'Sharedle',
 			text: `Sharedle ${wordleIndex} ${guessCount+1}/6\nTry it yourself!\n${emojis}`,
-			url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`
+			url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`,
+			url: `https://carterbryantt.github.io/Sharedle/`
 		});
 	} catch(err) {
 		console.log(err);
