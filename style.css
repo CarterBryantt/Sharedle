@@ -37,25 +37,17 @@ p {
 
 /* TITLE */
 #title {
-	position: relative;
-	text-align: center;
-	font-size: 3rem;
-	color: #ffffff;
-	letter-spacing: 5px;
-}
-
-#title-share-icon {
-	position: absolute;
-	transform: scale(-0.9, 1);
-	font-size: 50px;
-	left: 184px;
-	top: -12.95px
+	width: 65%;
+	height: 42px;
+	margin: auto;
 }
 
 /* CONTAINER */
 .container {
 	width: 400px;
 	margin: auto;
+	display: flex;
+	flex-direction: column;
 }
 
 /* INPUT LETTERS */
