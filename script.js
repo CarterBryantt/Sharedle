@@ -16,7 +16,6 @@ let urlIndex,
 let letterDivs, keyDivs;
 
 function setup() {
-        localStorage.clear();
 	{
 		disableInput = false; // Boolean value that won't allow the user to type letters if true
 		activeScreen = JSON.parse(localStorage.getItem('active-screen')) || 0; // Tells which screen should pop up (start or end) 0 = start, 1 = end
