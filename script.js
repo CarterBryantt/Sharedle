@@ -1,3 +1,4 @@
+localStorage.clear()
 import {byDate as wordles, valid as validWords, all as allWords, futureWords} from "./word-lists.js"; // Import all word lists from word list file
 
 // ------------------------------------------------------------------------
