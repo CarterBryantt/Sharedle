@@ -351,11 +351,11 @@ async function share() {
 	try {
 		await navigator.share({
 			title: 'Sharedle',
-			text: `Sharedle ${wordleIndex} ${guessCount+1}/6\nTry it yourself!\n${emojis}`,
+			text: `Sharedle ${wordleIndex} ${guessCount+1}/6\nTry it yourself!\n${emojis}\nhttps://carterbryantt.github.io/Sharedle/`,
 			url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`,
-			url: `https://carterbryantt.github.io/Sharedle/`
 		});
 	} catch(err) {
+		displayMessage("Sorry, an error occured when trying to share.\nPlease check your device settings or try again later.");
 		console.log(err);
 	}
 }
