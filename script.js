@@ -1,46 +1,54 @@
 import {byDate as wordles, valid as validWords, all as allWords, futureWords} from "./word-lists.js"; // Import all word lists from word list file
 
-// window.onload = () => {
-
-// }
-
 // ------------------------------------------------------------------------
 // INPUT
 // ------------------------------------------------------------------------
-let disableInput = false;
+let disableInput,
+	activeScreen,
+	currentGuess,
+	guessCount,
+	lastLength;
 
-let currentGuess = ""; // String to keep track of the current word being input
-let guessCount = 0; // Number to keep track of how many guesses the user has made
+let urlIndex,
+	wordleIndex,
+	wordle;
 
-let urlIndex = new URLSearchParams(window.location.search).get('index'); // Get index from search params
-let wordleIndex = urlIndex || Math.floor(Math.random() * wordles.length); // Make wordleIndex urlIndex if a urlIndex was provided, otherwise generate a random index
-let wordle = wordles[wordleIndex]; // Pick a random word from list of wordles
-document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
+let letterDivs, keyDivs;
 
-let activeScreen = 0; // Tells which screen should pop up (start or end) 0 = start, 1 = end
+function setup() {
+	{
+		disableInput = false; // Boolean value that won't allow the user to type letters if true
+		activeScreen = 0; // Tells which screen should pop up (start or end) 0 = start, 1 = end
+		currentGuess = ""; // String to keep track of the current word being input
+		guessCount = 0; // Number to keep track of how many guesses the user has made
+		lastLength = 0; // Last currentWord length; variable used in `update` function
 
-let lastLength = 0; // Last currentWord length; variable used in `update` function
+		urlIndex = new URLSearchParams(window.location.search).get('index'); // Get index from search params
+		wordleIndex = urlIndex || Math.floor(Math.random() * wordles.length); // Make wordleIndex urlIndex if a urlIndex was provided, otherwise generate a random index
+		wordle = wordles[wordleIndex]; // Pick a random word from list of wordles
+	} // Set up variables 
 
-document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', showHideScreen)); // Get close screen buttons and add click event
-document.getElementById('menu-button').addEventListener('click', showHideScreen); // Get close screen buttons and add click event
+	{	
+		document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
 
-// document.getElementById('select-wordle-button').addEventListener('click', selectWordle);
+		document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', showHideScreen)); // Get close screen buttons and add click event
+		document.getElementById('menu-button').addEventListener('click', showHideScreen); // Get close screen buttons and add click event
 
-let letterDivs = document.querySelectorAll('.letter-box'); // Get letter boxes
+		letterDivs = document.querySelectorAll('.letter-box'); // Get letter boxes
+		keyDivs = document.querySelectorAll('.key'); // Get all keyboard keys
+		for (let i = 0; i < keyDivs.length; i++) {
+			keyDivs[i].addEventListener('click', keyPress);
+		} // Add event listener to all key divs to listen for mouse clicks
 
-let keyDivs = document.querySelectorAll('.key'); // Get all keyboard keys
+		document.querySelectorAll('.restart-button').forEach(e => e.addEventListener('click', restartGame)); // Reset game when the restart button is clicked
+		document.getElementById('share-button').addEventListener('click', share); // Bring up share screen to share emojis
+		document.addEventListener('keydown', keyPress); // Add event listener to the document to listen for keypresses
+	} // Add event listeners to divs
 
-for (let i = 0; i < keyDivs.length; i++) {
-	keyDivs[i].addEventListener('click', keyPress);
-} // Add event listener to all key divs to listen for mouse clicks
+	fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
+} // Get game setup
+window.onload = setup();
 
-document.querySelectorAll('.restart-button').forEach(e => e.addEventListener('click', restartGame)); // Reset game when the restart button is clicked
-
-document.getElementById('share-button').addEventListener('click', share); // Bring up share screen to share emojis
-
-document.addEventListener('keydown', keyPress); // Add event listener to the document to listen for keypresses
-
-fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
 
 function keyPress(e) {
 	if (disableInput || document.activeElement == document.getElementById('password')) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
@@ -98,6 +106,7 @@ function colorKey(letter, state) {
 	}
 } // Color keyboard key a given state color
 
+
 function updateWord(guess, row) {
 	for (let i = 0; i < 5; i++) {
 		letterDivs[(5*row)+i].innerHTML = guess[i] || "";
@@ -105,7 +114,7 @@ function updateWord(guess, row) {
 		letterDivs[(5*row)+i].style.borderColor = guess[i] ? "var(--border-light)" : "var(--border-dark)"; // If theres a letter in the letter box, color the border light
 		
 		// Box animation
-		if (guess.length > lastLength) {
+		if (guess.length == lastLength+1) {
 			letterDivs[(5*row)+lastLength].classList.add("pop");
 		} else if (guess != 5) {
 			for (let i = 0; i < 5; i++) {
@@ -121,6 +130,7 @@ function updateWord(guess, row) {
 	} // If the letter box has the shake class and decreased in length, remove the class
 	lastLength = guess.length;
 } // Update word using key presses
+
 
 function showHideScreen() {
 	// document.getElementById('start-screen').style.display = ["flex", "none"][activeScreen]; // If active screen = 0, display start screen
@@ -140,18 +150,6 @@ function showHideScreen() {
 	}
 } // Shows/hides the currently active screen (flips between display states)
 
-// function selectWordle() {
-// 	showHideScreen();
-// 	if (guessCount > 0) return; // If the player has already started playing, exit functon
-
-// 	wordleIndex = document.getElementById('wordle-index').value;
-
-// 	if (wordleIndex == "" || wordleIndex < 0 || wordleIndex >= wordles.length) return; // If the index input is empty, negative, or bigger than the list of words, exit function
-
-// 	localStorage.setItem('solution-index', JSON.stringify(wordleIndex)); // Index of the sharedle the player has to guess
-// 	changeSolution(wordleIndex);
-// } // Changes the current wordle to the wordle at the inputted index
-
 function displayMessage(message) {
 	let popup = document.createElement('div');
 	popup.classList.add('popup');
@@ -162,14 +160,17 @@ function displayMessage(message) {
 
 	let messageContainer = document.querySelector('.message-container')
 	messageContainer.insertBefore(popup, messageContainer.firstChild);
-}
+} // Displays a message for the user
 
+// ------------------------------------------------------------------------
+// ANIMATIONS
+// ------------------------------------------------------------------------
 function colorBox(box, color) {
 	box.style.backgroundColor = color;
 	box.style.borderColor = color;
-}
+} // Set the given letter box's color
 
-function flipBox(colors, i, row, flipQuickly = false) {
+function flipBox(colors, i, row) {
 	let letterBox = letterDivs[(5*row)+i];
 	letterBox.classList.remove('pop'); // Remove pop class so it doesn't interfere with animation
 
@@ -181,11 +182,11 @@ function flipBox(colors, i, row, flipQuickly = false) {
 		letterBox.removeEventListener("animationiteration", tempOne);
 		letterBox.removeEventListener("animationend", tempTwo);
 		letterBox.classList.remove('flip');
-		if (i < 4 && !flipQuickly) {
+		if (i < 4) {
 			flipBox(colors, i+1, row); 
 		} else {
 			for (let j = 0; j < 5; j++) {
-				colorKey(colorKey(letterDivs[(5*row)+j].innerHTML, colors[j]));
+				colorKey(letterBox.innerHTML, colors[j]);
 			}
 		} // Flip next letter box unless this is the last letter box or we are flipping the boxes quickly, after all boxes are filled, color keys
 	};
@@ -194,18 +195,44 @@ function flipBox(colors, i, row, flipQuickly = false) {
 	letterBox.addEventListener("animationend", tempTwo);
 
 	letterBox.classList.add('flip'); // Start animation
-}
+} // Animates letter box to flip over and reveal it's state
 
 function quickFlip(colors, row, interval) {
 	for (let i = 0; i < 5; i++) {
-		setInterval(flipBox(colors, i, row, true), interval*i);
+		setTimeout(function() {
+			let letterBox = letterDivs[(5*row)+i];
+			letterBox.classList.remove('pop'); // Remove pop class so it doesn't interfere with animation
+
+			// Create temporary functions so that we can remove them when the animation ends
+			let tempOne = () => {
+				//console.log(letterBox, colors[i])
+				colorBox(letterBox, colors[i]);
+			}
+			let tempTwo = () => {
+				//console.log(letterBox)
+				letterBox.removeEventListener("animationiteration", tempOne);
+				letterBox.removeEventListener("animationend", tempTwo);
+				letterBox.classList.remove('flip');
+				if (i == 4) {
+					for (let j = 0; j < 5; j++) {
+						colorKey(letterBox.innerHTML, colors[j]);
+					}
+				}
+			};
+
+			letterBox.addEventListener("animationiteration", tempOne); // After the letter box has completed one iteration of the animation (It's exactly flat), change its color
+			letterBox.addEventListener("animationend", tempTwo);
+
+			letterBox.classList.add('flip'); // Start animation
+		}, interval*i);
 	} // Flip letters with a gap equal to interval
-}
+} // Flips the boxes quickly when the page is refreshed
 
 function changeSolution(index) {
 	wordle = wordles[index]; // Pick a random word from list of wordles
 	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
 }
+
 // ------------------------------------------------------------------------
 // ALGORITHM
 // ------------------------------------------------------------------------
@@ -368,7 +395,7 @@ function fillInGuesses() {
 
 	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
 	let wordStates = JSON.parse(localStorage.getItem('word-states'));
-	for (let i = 0; i < guessedWords.length; i++) {
+	for (let i = 0; i < guessCount; i++) {
 		updateWord(guessedWords[i].toUpperCase(), i);
 		quickFlip(wordStates[i], i, 200);
 	}
