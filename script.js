@@ -251,14 +251,6 @@ function guessWord(guess) {
 		return;
 	} // If guess is not a valid word, shake letters and exit function
 	
-	// if (guess == wordle) {
-	// 	activeScreen = 1;
-	// 	disableInput = true;
-	// 	flipBox(new Array(5).fill("var(--correct)"), 0, guessCount); // Color squares correct
-	// 	setTimeout(showHideScreen, 3000); // Wait til all letters have flipped before showing end screen
-	// 	return;
-	// } // If the guess is the wordle, the player wins
-	
 	let boxColors = new Array(5); // Array that holds all the cells colors
 	let tempWordle = wordle.split(''); // Temorary wordle that we can remove letters from so that we don't count letters more than once
 	let correctIndicies = []; // List of correctly placed letter's indicies
