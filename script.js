@@ -18,7 +18,7 @@ let letterDivs, keyDivs;
 function setup() {
 	{
 		disableInput = false; // Boolean value that won't allow the user to type letters if true
-		activeScreen = 0; // Tells which screen should pop up (start or end) 0 = start, 1 = end
+		activeScreen = JSON.parse(localStorage.getItem('active-screen')) || 0; // Tells which screen should pop up (start or end) 0 = start, 1 = end
 		currentGuess = ""; // String to keep track of the current word being input
 		guessCount = 0; // Number to keep track of how many guesses the user has made
 		lastLength = 0; // Last currentWord length; variable used in `update` function
@@ -30,6 +30,8 @@ function setup() {
 
 	{	
 		document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
+		
+		showHideScreen();
 
 		document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', showHideScreen)); // Get close screen buttons and add click event
 		document.getElementById('menu-button').addEventListener('click', showHideScreen); // Get close screen buttons and add click event
@@ -133,15 +135,17 @@ function updateWord(guess, row) {
 
 
 function showHideScreen() {
-	// document.getElementById('start-screen').style.display = ["flex", "none"][activeScreen]; // If active screen = 0, display start screen
-	document.getElementById('end-screen').style.display = ["flex", "none"][1^activeScreen]; // If active screen = 1, display end screen
-	console.log(["flex", "none"][1^activeScreen])
+	let screens = document.querySelectorAll('.screen');
+	for (let i = 0; i < screens.length; i++) {
+		if (i == activeScreen) { screens[i].style.display = "flex"; break; }
+		screens[i].style.display = "none";
+	}
 
 	let overlay = document.querySelector('.overlay');
 	switch(window.getComputedStyle(overlay).display) {
 		case "block":
 			overlay.style.display = "none";
-			if (activeScreen == 0) disableInput = false; // Only allow input to be active if the game isn't over
+			if (activeScreen != 2) disableInput = false; // Only allow input to be active if the game isn't over
 			break;
 		case "none":
 			overlay.style.display = "block";
@@ -186,7 +190,7 @@ function flipBox(colors, i, row) {
 			flipBox(colors, i+1, row); 
 		} else {
 			for (let j = 0; j < 5; j++) {
-				colorKey(letterBox.innerHTML, colors[j]);
+				colorKey(letterDivs[(5*row)+j].innerHTML, colors[j]);
 			}
 		} // Flip next letter box unless this is the last letter box or we are flipping the boxes quickly, after all boxes are filled, color keys
 	};
@@ -215,7 +219,7 @@ function quickFlip(colors, row, interval) {
 				letterBox.classList.remove('flip');
 				if (i == 4) {
 					for (let j = 0; j < 5; j++) {
-						colorKey(letterBox.innerHTML, colors[j]);
+						colorKey(letterDivs[(5*row)+j].innerHTML, colors[j]);
 					}
 				}
 			};
@@ -282,12 +286,14 @@ function guessWord(guess) {
 
 	if (guessCount == 5 || guess == wordle) {
 		console.log("s")
-		activeScreen = 1;
+		activeScreen = 2;
 		disableInput = true;
 		setTimeout(showHideScreen, 3000); // Wait til all letters have flipped before showing end screen
 		return;
 	} // This was the player's last guess and they didn't win
 
+	activeScreen = 1;
+	localStorage.setItem('active-screen', '1');
 	guessCount++; // Increase number of guesses made
 	currentGuess = ""; // Clear current guess
 }
@@ -303,7 +309,6 @@ function restartGame() {
 	wordleIndex = Math.floor(Math.random() * wordles.length); // Pick a new random word from list of wordles
 	wordle = wordles[wordleIndex];
 	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
-	document.getElementById('wordle-index').value = ""; // Clear wordle index input value
 	showHideScreen();
 
 	initStorage();
@@ -363,6 +368,7 @@ function initStorage() {
 	localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
 	localStorage.setItem('current-row', "0"); // Number indicating the row the player is currently on
 	localStorage.setItem('solution-index', wordleIndex); // Index of the sharedle the player has to guess
+	localStorage.setItem('active-screen', "0"); // Index of the sharedle the player has to guess
 	console.log(localStorage, wordleIndex)
 }
 
