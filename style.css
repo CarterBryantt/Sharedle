@@ -93,8 +93,8 @@ p {
 }
 
 @keyframes pop {
-	from {transform: scale(1.0);}
-	to {transform: scale(1.3);}
+	from { transform: scale(1.0); }
+	to { transform: scale(1.3); }
 }
 
 .shake-0 {
@@ -112,15 +112,31 @@ p {
 }
 
 @keyframes shake-0 {
-	0% {transform: translate(0px, 0px);}
-	50% {transform: translate(-1rem, 0px);}
-	100% {transform: translate(1rem, 0px);}
+	0% { transform: translate(0px, 0px); }
+	50% { transform: translate(-1rem, 0px); }
+	100% { transform: translate(1rem, 0px); }
 }
 
 @keyframes shake-1 {
-	0% {transform: translate(0px, 0px);}
-	50% {transform: translate(-1rem, 0px);}
-	100% {transform: translate(1rem, 0px);}
+	0% { transform: translate(0px, 0px); }
+	50% { transform: translate(-1rem, 0px); }
+	100% { transform: translate(1rem, 0px); }
+}
+
+.bounce {
+	animation-name: bounce;
+	animation-duration: 0.8s;
+	animation-iteration-count: 1;
+	animation-timing-function: cubic-bezier(.19,.08,1,.87);
+}
+
+@keyframes bounce {
+	16.5% { transform: translateY(-20px); }
+	33% { transform: translateY(14px); }
+	49.5% { transform: translateY(-12px); }
+	66% { transform: translateY(0px); }
+	82.5% { transform: translateY(5px); }
+	100% { transform: translateY(0px); }
 }
 
 /* KEYBOARD */

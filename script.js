@@ -42,6 +42,10 @@ function setup() {
 			keyDivs[i].addEventListener('click', keyPress);
 		} // Add event listener to all key divs to listen for mouse clicks
 
+		// for (let i = 0; i < letterDivs.length; i++) {
+		// 	letterDivs[i].addEventListener('click', e => e.target.classList.add('bounce'));
+		// } // Add event listener to all key divs to listen for mouse clicks
+
 		document.querySelectorAll('.restart-button').forEach(e => e.addEventListener('click', restartGame)); // Reset game when the restart button is clicked
 		document.getElementById('share-button').addEventListener('click', share); // Bring up share screen to share emojis
 		document.addEventListener('keydown', keyPress); // Add event listener to the document to listen for keypresses
@@ -174,29 +178,30 @@ function colorBox(box, color) {
 	box.style.borderColor = color;
 } // Set the given letter box's color
 
-function flipBox(colors, i, row) {
+function flipBox(colors, i, row, gameOver) {
 	let letterBox = letterDivs[(5*row)+i];
 	letterBox.classList.remove('pop'); // Remove pop class so it doesn't interfere with animation
 
 	// Create temporary functions so that we can remove them when the animation ends
-	let tempOne = () => { 
+	let color = () => { 
 		colorBox(letterBox, colors[i]);
 	}
-	let tempTwo = () => {
-		letterBox.removeEventListener("animationiteration", tempOne);
-		letterBox.removeEventListener("animationend", tempTwo);
+	let animEnd = () => {
+		letterBox.removeEventListener("animationiteration", color);
+		letterBox.removeEventListener("animationend", animEnd);
 		letterBox.classList.remove('flip');
 		if (i < 4) {
-			flipBox(colors, i+1, row); 
+			flipBox(colors, i+1, row, gameOver); 
 		} else {
 			for (let j = 0; j < 5; j++) {
 				colorKey(letterDivs[(5*row)+j].innerHTML, colors[j]);
 			}
+			if (gameOver) bounceBoxes(row, 200);
 		} // Flip next letter box unless this is the last letter box or we are flipping the boxes quickly, after all boxes are filled, color keys
 	};
 
-	letterBox.addEventListener("animationiteration", tempOne); // After the letter box has completed one iteration of the animation (It's exactly flat), change its color
-	letterBox.addEventListener("animationend", tempTwo);
+	letterBox.addEventListener("animationiteration", color); // After the letter box has completed one iteration of the animation (It's exactly flat), change its color
+	letterBox.addEventListener("animationend", animEnd);
 
 	letterBox.classList.add('flip'); // Start animation
 } // Animates letter box to flip over and reveal it's state
@@ -208,14 +213,12 @@ function quickFlip(colors, row, interval) {
 			letterBox.classList.remove('pop'); // Remove pop class so it doesn't interfere with animation
 
 			// Create temporary functions so that we can remove them when the animation ends
-			let tempOne = () => {
-				//console.log(letterBox, colors[i])
+			let color = () => {
 				colorBox(letterBox, colors[i]);
 			}
-			let tempTwo = () => {
-				//console.log(letterBox)
-				letterBox.removeEventListener("animationiteration", tempOne);
-				letterBox.removeEventListener("animationend", tempTwo);
+			let animEnd = () => {
+				letterBox.removeEventListener("animationiteration", color);
+				letterBox.removeEventListener("animationend", animEnd);
 				letterBox.classList.remove('flip');
 				if (i == 4) {
 					for (let j = 0; j < 5; j++) {
@@ -224,13 +227,29 @@ function quickFlip(colors, row, interval) {
 				}
 			};
 
-			letterBox.addEventListener("animationiteration", tempOne); // After the letter box has completed one iteration of the animation (It's exactly flat), change its color
-			letterBox.addEventListener("animationend", tempTwo);
+			letterBox.addEventListener("animationiteration", color); // After the letter box has completed one iteration of the animation (It's exactly flat), change its color
+			letterBox.addEventListener("animationend", animEnd);
 
 			letterBox.classList.add('flip'); // Start animation
 		}, interval*i);
 	} // Flip letters with a gap equal to interval
 } // Flips the boxes quickly when the page is refreshed
+
+function bounceBoxes(row, interval) {
+	for (let i = 0; i < 5; i++) {
+		setTimeout(function() {
+			let letterBox = letterDivs[(5*row)+i];
+
+			let animEnd = () => {
+				letterBox.removeEventListener("animationend", animEnd);
+				letterBox.classList.remove('bounce');
+			}
+
+			letterBox.addEventListener("animationend", animEnd);
+			letterBox.classList.add('bounce');
+		}, interval*i);
+	} // Bounce boxes with a gap equal to interval
+} // Bounce letters when the player wins
 
 function changeSolution(index) {
 	wordle = wordles[index]; // Pick a random word from list of wordles
@@ -274,13 +293,13 @@ function guessWord(guess) {
 	} // Check for present letters
 
 	updateStorage(guess, boxColors); // Update local storage
-	flipBox(boxColors, 0, guessCount); // Flip first box
+	flipBox(boxColors, 0, guessCount, guess == wordle); // Flip first box
 
 	if (guessCount == 5 || guess == wordle) {
-		console.log("s")
 		activeScreen = 2;
+		localStorage.setItem('active-screen', '2');
 		disableInput = true;
-		setTimeout(showHideScreen, 3000); // Wait til all letters have flipped before showing end screen
+		setTimeout(showHideScreen, 5000); // Wait til all letters have flipped before showing end screen
 		return;
 	} // This was the player's last guess and they didn't win
 
@@ -335,16 +354,17 @@ function generateEmojis() {
 				break;
 		}
 	}
-	return emojis;
+	return emojis.slice(0, -1); // Remove last newline (\n) from string
 }
 
 async function share() {
 	let emojis = generateEmojis();
+	console.log(`Sharedle ${wordleIndex} ${guessCount == 5 ? "X" : guessCount+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`)
 	try {
 		await navigator.share({
 			title: 'Sharedle',
-			text: `Sharedle ${wordleIndex} ${guessCount+1}/6\nTry it yourself!\n${emojis}\nhttps://carterbryantt.github.io/Sharedle/`,
-			url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`,
+			text: `Sharedle ${wordleIndex} ${guessCount == 5 ? "X" : guessCount+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`,
+			// url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`,
 		});
 	} catch(err) {
 		displayMessage("Sorry, an error occured when trying to share.\nPlease check your device settings or try again later.");
