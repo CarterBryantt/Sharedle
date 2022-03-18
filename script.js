@@ -6,7 +6,7 @@ import {byDate as wordles, valid as validWords, all as allWords, futureWords} fr
 let disableInput,
 	activeScreen,
 	currentGuess,
-	guessCount,
+	//guessCount,
 	lastLength;
 
 let urlIndex,
@@ -15,21 +15,21 @@ let urlIndex,
 
 let letterDivs, keyDivs;
 
+let storage = {
+	get currentRow() { return JSON.parse(localStorage.getItem('current-row')); },
+	get solutionIndex() { return JSON.parse(localStorage.getItem('solution-index')); },
+	get solution() { return localStorage.getItem('solution'); }
+}
+
 function setup() {
 	{
-		disableInput = false; // Boolean value that won't allow the user to type letters if true
-		activeScreen = JSON.parse(localStorage.getItem('active-screen')) || 0; // Tells which screen should pop up (start or end) 0 = start, 1 = end
+		disableInput = false; // Boolean value that won't allow the user to type letters if true	
 		currentGuess = ""; // String to keep track of the current word being input
-		guessCount = 0; // Number to keep track of how many guesses the user has made
 		lastLength = 0; // Last currentWord length; variable used in `update` function
-
-		urlIndex = new URLSearchParams(window.location.search).get('index'); // Get index from search params
-		wordleIndex = urlIndex || Math.floor(Math.random() * wordles.length); // Make wordleIndex urlIndex if a urlIndex was provided, otherwise generate a random index
-		wordle = wordles[wordleIndex]; // Pick a random word from list of wordles
 	} // Set up variables 
 
 	{	
-		document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
+		document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
 		
 		showHideScreen();
 
@@ -41,10 +41,6 @@ function setup() {
 		for (let i = 0; i < keyDivs.length; i++) {
 			keyDivs[i].addEventListener('click', keyPress);
 		} // Add event listener to all key divs to listen for mouse clicks
-
-		// for (let i = 0; i < letterDivs.length; i++) {
-		// 	letterDivs[i].addEventListener('click', e => e.target.classList.add('bounce'));
-		// } // Add event listener to all key divs to listen for mouse clicks
 
 		document.querySelectorAll('.restart-button').forEach(e => e.addEventListener('click', restartGame)); // Reset game when the restart button is clicked
 		document.getElementById('share-button').addEventListener('click', share); // Bring up share screen to share emojis
@@ -66,13 +62,13 @@ function keyPress(e) {
 			if (keyDiv.id == "backspace" && currentGuess.length != 0) currentGuess = currentGuess.slice(0, -1); // Check if the key pressed is the backspace key, if it is, remove the last letter from the word. Also make sure there is at least 1 letter in the current guess
 
 			if (keyDiv.innerHTML == "ENTER" && currentGuess.length == 5) guessWord(currentGuess.toLowerCase()); // Check if the key pressed is the enter key, if it is, run the search algorithm on the word. Also check if the current guess is at least 5 letters long
-			updateWord(currentGuess, guessCount); // Display new word
+			updateWord(currentGuess, storage.currentRow); // Display new word
 			return;
 		} // Check if key pressed is a miscellaneous key or if it is the backspace icon, if it is don't add text to input word
 
 		if (currentGuess.length != 5) currentGuess += keyDiv.innerHTML; // If current guess is not already five letters long and the div key pressed is a letter, add the letter to the current guess
 
-		updateWord(currentGuess, guessCount); // Display new word
+		updateWord(currentGuess, storage.currentRow); // Display new word
 	} // If the event that triggered the function is a click event
 	if (e.type == "keydown") {
 		let key = e.code; // Get key pressed
@@ -85,7 +81,7 @@ function keyPress(e) {
 
 		if (currentGuess.length != 5 && key != "Enter" && key != "Backspace") currentGuess += key.slice(3); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
 
-		if (guessCount != 6) updateWord(currentGuess, guessCount); // Display new word
+		if (storage.currentRow != 6) updateWord(currentGuess, storage.currentRow); // Display new word
 	} // If the event that triggered the function is a keypress event
 } // Register key presses from keyboard and update word
 
@@ -141,7 +137,7 @@ function updateWord(guess, row) {
 function showHideScreen() {
 	let screens = document.querySelectorAll('.screen');
 	for (let i = 0; i < screens.length; i++) {
-		if (i == activeScreen) { screens[i].style.display = "flex"; break; }
+		if (i == JSON.parse(localStorage.getItem('active-screen'))) { screens[i].style.display = "flex"; break; }
 		screens[i].style.display = "none";
 	}
 
@@ -149,7 +145,7 @@ function showHideScreen() {
 	switch(window.getComputedStyle(overlay).display) {
 		case "block":
 			overlay.style.display = "none";
-			if (activeScreen != 2) disableInput = false; // Only allow input to be active if the game isn't over
+			if (JSON.parse(localStorage.getItem('active-screen')) != 2) disableInput = false; // Only allow input to be active if the game isn't over
 			break;
 		case "none":
 			overlay.style.display = "block";
@@ -251,33 +247,28 @@ function bounceBoxes(row, interval) {
 	} // Bounce boxes with a gap equal to interval
 } // Bounce letters when the player wins
 
-function changeSolution(index) {
-	wordle = wordles[index]; // Pick a random word from list of wordles
-	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
-}
-
 // ------------------------------------------------------------------------
 // ALGORITHM
 // ------------------------------------------------------------------------
 function guessWord(guess) {
 	if (!allWords.includes(guess)) {
 		for (let i = 0; i < 5; i++) {
-			let flip = letterDivs[(5*guessCount)+i].classList.contains("shake-0") ? 1 : 0; // Get animation number, so we can flip to the other one
-			letterDivs[(5*guessCount)+i].classList.remove(`shake-${1^flip}`);
-			letterDivs[(5*guessCount)+i].classList.add(`shake-${flip}`);
+			let flip = letterDivs[(5*storage.currentRow)+i].classList.contains("shake-0") ? 1 : 0; // Get animation number, so we can flip to the other one
+			letterDivs[(5*storage.currentRow)+i].classList.remove(`shake-${1^flip}`);
+			letterDivs[(5*storage.currentRow)+i].classList.add(`shake-${flip}`);
 		}
 		displayMessage("Not a valid word");
 		return;
 	} // If guess is not a valid word, shake letters and exit function
 	
 	let boxColors = new Array(5); // Array that holds all the cells colors
-	let tempWordle = wordle.split(''); // Temorary wordle that we can remove letters from so that we don't count letters more than once
+	let tempWordle = storage.solution.split(''); // Temorary wordle that we can remove letters from so that we don't count letters more than once
 	let correctIndicies = []; // List of correctly placed letter's indicies
 	for (let i = 0; i < 5; i++) {
-		if (wordle[i] == guess[i]) {
+		if (storage.solution[i] == guess[i]) {
 			boxColors[i] = "var(--correct)"; // Set square color to correct
 			correctIndicies.push(i); // Add index to list of correct indicies
-			tempWordle.splice(tempWordle.indexOf(wordle[i]), 1); // Remove letter from temporary wordle
+			tempWordle.splice(tempWordle.indexOf(storage.solution[i]), 1); // Remove letter from temporary wordle
 			continue; // Skip current iteration
 		} // If the two letters are in the same place
 		
@@ -292,38 +283,35 @@ function guessWord(guess) {
 		} // If the current letter is in the wordle and the current index isn't a letter that is already correctly placed
 	} // Check for present letters
 
-	updateStorage(guess, boxColors); // Update local storage
-	flipBox(boxColors, 0, guessCount, guess == wordle); // Flip first box
+	//updateStorage(guess, boxColors); // Update local storage
+	flipBox(boxColors, 0, storage.currentRow, guess == storage.solution); // Flip first box
 
-	if (guessCount == 5 || guess == wordle) {
-		activeScreen = 2;
+	if (storage.currentRow == 5 || guess == storage.solution) {
 		localStorage.setItem('active-screen', '2');
 		disableInput = true;
 		setTimeout(showHideScreen, 5000); // Wait til all letters have flipped before showing end screen
 		return;
 	} // This was the player's last guess and they didn't win
 
-	activeScreen = 1;
 	localStorage.setItem('active-screen', '1');
-	guessCount++; // Increase number of guesses made
+	localStorage.setItem('current-row', storage.currentRow+1);
 	currentGuess = ""; // Clear current guess
 }
 
 function restartGame() {
 	localStorage.clear();
 
-	guessCount = 0;
+	localStorage.setItem('current-row', '0');
 	currentGuess = "";
 	disableInput = false;
-	activeScreen = 0;
+	localStorage.setItem('active-screen', '0');
 
-	wordleIndex = Math.floor(Math.random() * wordles.length); // Pick a new random word from list of wordles
-	wordle = wordles[wordleIndex];
-	document.getElementById('wordle').innerHTML = `The word was: ${wordle.toUpperCase()}`;
+	//changeSolution();
 	showHideScreen();
 
 	initStorage();
-	
+	document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
+
 	for (let i = 0; i < keyDivs.length; i++) {
 		if (keyDivs[i].classList.contains("dark-key")) {
 			keyDivs[i].classList.remove("dark-key");
@@ -359,11 +347,11 @@ function generateEmojis() {
 
 async function share() {
 	let emojis = generateEmojis();
-	console.log(`Sharedle ${wordleIndex} ${guessCount == 5 ? "X" : guessCount+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`)
+	console.log(`Sharedle ${storage.solutionIndex} ${storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${storage.solutionIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`)
 	try {
 		await navigator.share({
 			title: 'Sharedle',
-			text: `Sharedle ${wordleIndex} ${guessCount == 5 ? "X" : guessCount+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`,
+			text: `Sharedle ${storage.solutionIndex} ${storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${storage.solutionIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`,
 			// url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`,
 		});
 	} catch(err) {
@@ -378,22 +366,23 @@ async function share() {
 function initStorage() {
 	localStorage.setItem('guessed-words', JSON.stringify(new Array(6).fill(""))); // List of guessed words
 	localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
-	localStorage.setItem('current-row', "0"); // Number indicating the row the player is currently on
-	localStorage.setItem('solution-index', wordleIndex); // Index of the sharedle the player has to guess
-	localStorage.setItem('active-screen', "0"); // Index of the sharedle the player has to guess
-	console.log(localStorage, wordleIndex)
+	localStorage.setItem('current-row', '0'); // Number indicating the row the player is currently on
+	localStorage.setItem('solution-index', Math.floor(Math.random() * wordles.length)); // Index of the sharedle the player has to guess
+	localStorage.setItem('solution', wordles[new URLSearchParams(window.location.search).get('index') || storage.solutionIndex]); // Index of the sharedle the player has to guess
+	localStorage.setItem('active-screen', '0'); // Index of the sharedle the player has to guess
+	console.log(localStorage)
 }
 
 function updateStorage(guess, states) {
 	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
 	let wordStates = JSON.parse(localStorage.getItem('word-states'));
 
-	guessedWords[guessCount] = guess;
-	wordStates[guessCount] = states;
+	guessedWords[storage.currentRow] = guess;
+	wordStates[storage.currentRow] = states;
 	
 	localStorage.setItem('guessed-words', JSON.stringify(guessedWords));
 	localStorage.setItem('word-states', JSON.stringify(wordStates));
-	localStorage.setItem('current-row', JSON.stringify(guessCount+1));
+	localStorage.setItem('current-row', JSON.stringify(storage.currentRow+1));
 }
 
 function fillInGuesses() {
@@ -407,13 +396,9 @@ function fillInGuesses() {
 	// -----------------------------------------
 	// EXECUTES ONLY IF GAME IS ALREADY GOING ON
 	// -----------------------------------------
-	guessCount = JSON.parse(localStorage.getItem('current-row'));
-
-	changeSolution(JSON.parse(localStorage.getItem('solution-index')));
-
 	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
 	let wordStates = JSON.parse(localStorage.getItem('word-states'));
-	for (let i = 0; i < guessCount; i++) {
+	for (let i = 0; i < storage.currentRow; i++) {
 		updateWord(guessedWords[i].toUpperCase(), i);
 		quickFlip(wordStates[i], i, 200);
 	}
