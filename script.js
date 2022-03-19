@@ -28,11 +28,7 @@ function setup() {
 		lastLength = 0; // Last currentWord length; variable used in `update` function
 	} // Set up variables 
 
-	{	
-		document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
-		
-		showHideScreen();
-
+	{
 		document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', showHideScreen)); // Get close screen buttons and add click event
 		document.getElementById('menu-button').addEventListener('click', showHideScreen); // Get close screen buttons and add click event
 
@@ -48,9 +44,11 @@ function setup() {
 	} // Add event listeners to divs
 
 	fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
+	showHideScreen();
+	document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
+	
 } // Get game setup
 window.onload = setup();
-
 
 function keyPress(e) {
 	if (disableInput || document.activeElement == document.getElementById('password')) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
@@ -133,7 +131,6 @@ function updateWord(guess, row) {
 	lastLength = guess.length;
 } // Update word using key presses
 
-
 function showHideScreen() {
 	let screens = document.querySelectorAll('.screen');
 	for (let i = 0; i < screens.length; i++) {
@@ -154,13 +151,13 @@ function showHideScreen() {
 	}
 } // Shows/hides the currently active screen (flips between display states)
 
-function displayMessage(message) {
+function displayMessage(message, time) {
 	let popup = document.createElement('div');
 	popup.classList.add('popup');
 	popup.innerHTML = message;
 
 	popup.addEventListener('transitionend', () => { popup.remove() });
-	setTimeout(() => { popup.classList.add('fade-out'); }, 1000);
+	setTimeout(() => { popup.classList.add('fade-out'); }, time);
 
 	let messageContainer = document.querySelector('.message-container')
 	messageContainer.insertBefore(popup, messageContainer.firstChild);
@@ -257,7 +254,7 @@ function guessWord(guess) {
 			letterDivs[(5*storage.currentRow)+i].classList.remove(`shake-${1^flip}`);
 			letterDivs[(5*storage.currentRow)+i].classList.add(`shake-${flip}`);
 		}
-		displayMessage("Not a valid word");
+		displayMessage("Not a valid word", 1000);
 		return;
 	} // If guess is not a valid word, shake letters and exit function
 	
@@ -289,6 +286,30 @@ function guessWord(guess) {
 	if (storage.currentRow == 5 || guess == storage.solution) {
 		localStorage.setItem('active-screen', '2');
 		disableInput = true;
+
+		let winMessage;
+		switch(storage.currentRow) {
+			case 0:
+				winMessage = "Incredible!";
+				break;
+			case 1:
+				winMessage = "Great!";
+				break;
+			case 2:
+				winMessage = "Solid!";
+				break;
+			case 3:
+				winMessage = "Nice Job!";
+				break;
+			case 4:
+				winMessage = "Cool!";
+				break;
+			case 5:
+				winMessage = "Close One!";
+				break;
+		}
+
+		setTimeout(() => displayMessage(winMessage, 3000), 2500);
 		setTimeout(showHideScreen, 5000); // Wait til all letters have flipped before showing end screen
 		return;
 	} // This was the player's last guess and they didn't win
@@ -355,7 +376,7 @@ async function share() {
 			// url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`,
 		});
 	} catch(err) {
-		displayMessage("Sorry, an error occured when trying to share.\nPlease check your device settings or try again later.");
+		displayMessage("Sorry, an error occured when trying to share.\nPlease check your device settings or try again later.", 2000);
 		console.log(err);
 	}
 }
@@ -387,8 +408,9 @@ function updateStorage(guess, states) {
 
 function fillInGuesses() {
 	let hasIndexChanged = urlIndex !== null && urlIndex != JSON.parse(localStorage.getItem('solution-index'));
+	let failSafe = localStorage.getItem('current-row') == 0 && localStorage.getItem('active-screen') != 0; // Just in case a glitch has occured where the player has not started playing and the active screen is not the beginning screen upon startup
 
-	if (localStorage.getItem('guessed-words') === null || hasIndexChanged) {
+	if (localStorage.getItem('guessed-words') === null || hasIndexChanged || failSafe) {
 		initStorage();
 		return;
 	} // If starting values aren't defined or the game index has changed, initialize them and exit function
