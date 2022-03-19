@@ -9,10 +9,6 @@ let disableInput,
 	//guessCount,
 	lastLength;
 
-let urlIndex,
-	wordleIndex,
-	wordle;
-
 let letterDivs, keyDivs;
 
 let storage = {
@@ -134,7 +130,7 @@ function updateWord(guess, row) {
 function showHideScreen() {
 	let screens = document.querySelectorAll('.screen');
 	for (let i = 0; i < screens.length; i++) {
-		if (i == JSON.parse(localStorage.getItem('active-screen'))) { screens[i].style.display = "flex"; break; }
+		if (i == JSON.parse(localStorage.getItem('active-screen'))) { screens[i].style.display = "flex"; continue; }
 		screens[i].style.display = "none";
 	}
 
@@ -280,7 +276,7 @@ function guessWord(guess) {
 		} // If the current letter is in the wordle and the current index isn't a letter that is already correctly placed
 	} // Check for present letters
 
-	//updateStorage(guess, boxColors); // Update local storage
+	updateStorage(guess, boxColors); // Update local storage
 	flipBox(boxColors, 0, storage.currentRow, guess == storage.solution); // Flip first box
 
 	if (storage.currentRow == 5 || guess == storage.solution) {
@@ -403,13 +399,14 @@ function updateStorage(guess, states) {
 	
 	localStorage.setItem('guessed-words', JSON.stringify(guessedWords));
 	localStorage.setItem('word-states', JSON.stringify(wordStates));
-	localStorage.setItem('current-row', JSON.stringify(storage.currentRow+1));
 }
 
 function fillInGuesses() {
+	let urlIndex = new URLSearchParams(window.location.search).get('index');
 	let hasIndexChanged = urlIndex !== null && urlIndex != JSON.parse(localStorage.getItem('solution-index'));
 	let failSafe = localStorage.getItem('current-row') == 0 && localStorage.getItem('active-screen') != 0; // Just in case a glitch has occured where the player has not started playing and the active screen is not the beginning screen upon startup
 
+	console.log(localStorage.getItem('guessed-words') === null, hasIndexChanged, failSafe)
 	if (localStorage.getItem('guessed-words') === null || hasIndexChanged || failSafe) {
 		initStorage();
 		return;
@@ -420,7 +417,7 @@ function fillInGuesses() {
 	// -----------------------------------------
 	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
 	let wordStates = JSON.parse(localStorage.getItem('word-states'));
-	for (let i = 0; i < storage.currentRow; i++) {
+	for (let i = 0; i < guessedWords.length; i++) {
 		updateWord(guessedWords[i].toUpperCase(), i);
 		quickFlip(wordStates[i], i, 200);
 	}
