@@ -4,9 +4,7 @@ import {byDate as wordles, valid as validWords, all as allWords, futureWords} fr
 // INPUT
 // ------------------------------------------------------------------------
 let disableInput,
-	activeScreen,
 	currentGuess,
-	//guessCount,
 	lastLength;
 
 let letterDivs, keyDivs;
