@@ -420,3 +420,19 @@ function fillInGuesses() {
 		quickFlip(wordStates[i], i, 200);
 	}
 }
+
+// ------------------------------------------------------------------------
+// RESIZE GAME
+// ------------------------------------------------------------------------
+window.onresize = function () {
+	let game = document.querySelector(".game");
+	let letters = document.querySelector(".input-letters");
+	console.log(game.offsetHeight, letters.offsetHeight)
+	if (game.offsetHeight == document.querySelector(".input-letters").offsetHeight) {
+		let totalHeight = 784.25; // Total height of game elements
+		let offset = totalHeight - document.querySelector('.container').offsetHeight;
+		console.log(offset)
+		letters.style.width = `${481 - offset}px`;
+		letters.style.height = `${481 - offset}px`;
+	}
+}
