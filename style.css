@@ -26,9 +26,6 @@
 
 body {
 	margin: 0px;
-	/* min-width: 600px;
-	width: auto !important;
-	width: 600px; */
 	overflow: hidden;
 	background-color: var(--dark-grey)
 }
@@ -388,34 +385,38 @@ input[type=number] {
 	transition: opacity 0.2s linear; /* wait til div is completely transparent, then hide */
 }
 
-/* @media screen and (max-width: 620px) {
+@media screen and (max-width: 620px) {
 	p {
 		padding: 0px 7.5px;
 		font-size: 12.5px;
-	} */
+	}
 
 	/* CONTAINER */
-	/* .container {
+	.container {
 		width: 250px;
-	} */
+	}
 	
 	/* INPUT LETTERS */
-	/* .input-letters {
+	.game {
+		width: 250px;
+	}
+
+	.input-letters {
 		width: 250px;
 		grid-template-columns: repeat(5, 47.6px);
 		column-gap: 3px;
 		row-gap: 3px;
-	} */
+	}
 	
-	/* .letter-box {
+	.letter-box {
 		width: 41.6px;
 		height: 41.6px;
 		
 		font-size: 31.5px;
 		line-height: 41px;
-	} */
+	}
 	
-	/* #absent-letters {
+	#absent-letters {
 		width: 112.5px;
 		min-height: 45px;
 		padding: 6.25px;
@@ -434,9 +435,9 @@ input[type=number] {
 	.settings {
 		width: 125px;
 	}
-	 */
+	
 	/* KEYBOARD */
-	/* .keyboard {
+	.keyboard {
 		width: 250px;
 		padding: 3.75px 0px;
 	}
@@ -459,10 +460,10 @@ input[type=number] {
 	.material-icons {
 		font-size: 13.2px;
 		line-height: 22.5px;
-	} */
+	}
 	
 	/* OVERLAY */
-	/* .screen {
+	.screen {
 		width: 162.5px;
 		height: 268.75px;
 		margin: 62.5px auto;
@@ -497,10 +498,10 @@ input[type=number] {
 
 		font-size: 10px;
 		line-height: 14px;
-	} */
+	}
 
 	/* MESSAGE DISPLAY */
-	/* .message-container {
+	.message-container {
 		row-gap: 6.25px;
 	}
 
@@ -514,4 +515,4 @@ input[type=number] {
 	.popup:nth-child(1) {
 		margin-top: 33px;
 	}
-} */
+}
