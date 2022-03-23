@@ -404,7 +404,6 @@ function fillInGuesses() {
 	let hasIndexChanged = urlIndex !== null && urlIndex != JSON.parse(localStorage.getItem('solution-index'));
 	let failSafe = localStorage.getItem('current-row') == 0 && localStorage.getItem('active-screen') != 0; // Just in case a glitch has occured where the player has not started playing and the active screen is not the beginning screen upon startup
 
-	console.log(localStorage.getItem('guessed-words') === null, hasIndexChanged, failSafe)
 	if (localStorage.getItem('guessed-words') === null || hasIndexChanged || failSafe) {
 		initStorage();
 		return;
@@ -424,15 +423,25 @@ function fillInGuesses() {
 // ------------------------------------------------------------------------
 // RESIZE GAME
 // ------------------------------------------------------------------------
+let defaultGameWidth = document.querySelector(".input-letters").offsetWidth; // Get initial starting height
+let defaultGameHeight = document.querySelector(".input-letters").offsetHeight; // Get initial starting height
+let boardRatio = defaultGameWidth/defaultGameHeight;
+let windowStartingHeight;
 window.onresize = function () {
 	let game = document.querySelector(".game");
-	let letters = document.querySelector(".input-letters");
-	console.log(game.offsetHeight, letters.offsetHeight)
-	if (game.offsetHeight == document.querySelector(".input-letters").offsetHeight) {
-		let totalHeight = 784.25; // Total height of game elements
-		let offset = totalHeight - document.querySelector('.container').offsetHeight;
-		console.log(offset)
-		letters.style.width = `${481 - offset}px`;
-		letters.style.height = `${481 - offset}px`;
+	let inputLetters = document.querySelector(".input-letters");
+
+	if (windowStartingHeight !== undefined) {
+		let windowOffset = windowStartingHeight - window.innerHeight;
+		if (windowOffset > 0) {
+			inputLetters.style.width = `${defaultGameWidth - (windowOffset*boardRatio)}px`;
+			inputLetters.style.height = `${defaultGameHeight - windowOffset}px`;
+		} // If the window got smaller
+		if (windowOffset <= 0) {
+			inputLetters.style.width = `${defaultGameWidth}px`;
+			inputLetters.style.height = `${defaultGameHeight}px`;
+		} // If the window is able to fit the game
 	}
+
+	if (game.offsetHeight == defaultGameHeight) windowStartingHeight = window.innerHeight; // Height of window when game div is no longer flex-growing
 }
