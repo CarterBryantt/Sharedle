@@ -55,6 +55,10 @@ function setup() {
 } // Get game setup
 window.onload = setup();
 
+document.getElementById('screen-sizer').onclick = function() {
+	alert(`Window: ${window.innerHeight} Container: ${document.querySelector('.container').offsetHeight} AvailableHeight: ${window.screen.availHeight}`);
+}
+
 function keyPress(e) {
 	if (storage.isInputDisabled || document.activeElement == document.getElementById('password')) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
 	
