@@ -390,7 +390,12 @@ input[type=number] {
 	transition: opacity 0.2s linear; /* wait til div is completely transparent, then hide */
 }
 
-@media screen and (max-width: 499px) {
+/* iPhone X */
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 812px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
 	#title {
 		height: 34px;
 	}
@@ -404,6 +409,42 @@ input[type=number] {
 		padding: 6px 0px;
 	}
 }
+
+/* iPhone 6+, 7+, and 8+ */
+@media only screen 
+  and (min-device-width: 414px) 
+  and (max-device-width: 736px) 
+  and (-webkit-min-device-pixel-ratio: 3)
+  and (orientation: portrait) { 
+	#title {
+		height: 34px;
+	}
+
+	.game {
+		width: 100%;
+	}
+
+	.keyboard {
+		max-width: 100%;
+		padding: 6px 0px;
+	}
+}
+
+/* @media screen and (max-width: 499px) {
+	#title {
+		height: 34px;
+	}
+
+	.game {
+		width: 100%;
+	}
+
+	.keyboard {
+		max-width: 100%;
+		padding: 6px 0px;
+	}
+} */
+
 /* @media screen and (max-width: 620px) {
 	p {
 		padding: 0px 7.5px;
