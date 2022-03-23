@@ -444,6 +444,8 @@ window.onresize = resizeGame;
 function resizeGame() {
 	let inputLetters = document.querySelector(".input-letters");
 
+	document.querySelector(".container").style.height = `${window.innerHeight}px`;
+
 	let windowOffset = 784 - window.innerHeight; // 784 is the total height of the header, game, and keyboard
 	if (windowOffset > 0) {
 		inputLetters.style.width = `${defaultGameWidth - (windowOffset*boardRatio)}px`;

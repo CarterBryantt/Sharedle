@@ -25,6 +25,8 @@
 }
 
 body {
+	width: 100vw;
+	height: 100vh;
 	margin: 0px;
 	overflow: hidden;
 	background-color: var(--dark-grey)
@@ -50,8 +52,6 @@ header {
 
 /* CONTAINER */
 .container {
-	height: 100%;
-	margin: auto;
 	display: flex;
 	flex-direction: column;
 }
