@@ -51,13 +51,8 @@ function setup() {
 	fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
 	showHideScreen();
 	document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
-	alert(`Window: ${window.innerHeight} Container: ${document.querySelector('.container').offsetHeight} AvailableHeight: ${window.screen.availHeight}`);
 } // Get game setup
 window.onload = setup();
-
-document.getElementById('screen-sizer').onclick = function() {
-	alert(`Window: ${window.innerHeight} Container: ${document.querySelector('.container').offsetHeight} AvailableHeight: ${window.screen.availHeight}`);
-}
 
 function keyPress(e) {
 	if (storage.isInputDisabled || document.activeElement == document.getElementById('password')) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
@@ -446,7 +441,7 @@ function resizeGame() {
 
 	document.querySelector(".container").style.height = `${window.innerHeight}px`;
 
-	let windowOffset = 784 - window.innerHeight; // 784 is the total height of the header, game, and keyboard
+	let windowOffset = 768 - window.innerHeight; // 784 is the total height of the header, game, and keyboard
 	if (windowOffset > 0) {
 		inputLetters.style.width = `${defaultGameWidth - (windowOffset*boardRatio)}px`;
 		inputLetters.style.height = `${defaultGameHeight - windowOffset}px`;
