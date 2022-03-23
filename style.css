@@ -248,18 +248,21 @@ header {
 	position: absolute;
 	top: 0;
 	left: 0;
-	
+
 	width: 100%;
 	height: 100%;
 	margin: auto;
 	background-color: rgba(100, 100, 100, 20%);
+
+	display: none;
+	justify-content: center;
+	align-items: center;
 }
 
 .screen {
 	width: 260px;
 	height: 380px;
 	position: relative;
-	margin: 110px auto;
 	background-color: #707375;
 	border: inset 5px #47484e;
 	border-radius: 12px;
@@ -324,23 +327,6 @@ header {
 	position: absolute;
 	top: 0;
 	right: 0;
-}
-
-#wordle-index {
-	width: 70%;
-	height: 20%;
-	/* margin: 10% auto 0px; */
-	
-	text-align: center;
-	font-size: 54px;
-
-	border-radius: 6px;
-	border: solid 2px #2e2e2f;
-	padding: 0px;
-}
-
-#wordle-index:focus {
-	border: solid 2px #e6e6e6;
 }
 
 input::-webkit-outer-spin-button,

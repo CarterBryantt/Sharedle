@@ -16,12 +16,14 @@ let defaultGameWidth,
 let storage = {
 	get currentRow() { return JSON.parse(localStorage.getItem('current-row')); },
 	get solutionIndex() { return JSON.parse(localStorage.getItem('solution-index')); },
-	get solution() { return localStorage.getItem('solution'); }
+	get solution() { return localStorage.getItem('solution'); },
+	get activeScreen() { return JSON.parse(localStorage.getItem('active-screen')); },
+	get isInputDisabled() { return JSON.parse(localStorage.getItem('is-input-disabled')); }
 }
 
 function setup() {
 	{
-		disableInput = false; // Boolean value that won't allow the user to type letters if true	
+		disableInput = false; // Boolean value that won't allow the user to type letters if true
 		currentGuess = ""; // String to keep track of the current word being input
 		lastLength = 0; // Last currentWord length; variable used in `update` function
 
@@ -54,7 +56,7 @@ function setup() {
 window.onload = setup();
 
 function keyPress(e) {
-	if (disableInput || document.activeElement == document.getElementById('password')) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
+	if (storage.isInputDisabled || document.activeElement == document.getElementById('password')) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
 	
 	if (e.type == "click") {
 		let keyDiv = e.target; // Get div clicked
@@ -137,19 +139,19 @@ function updateWord(guess, row) {
 function showHideScreen() {
 	let screens = document.querySelectorAll('.screen');
 	for (let i = 0; i < screens.length; i++) {
-		if (i == JSON.parse(localStorage.getItem('active-screen'))) { screens[i].style.display = "flex"; continue; }
+		if (i == storage.activeScreen) { screens[i].style.display = "flex"; continue; }
 		screens[i].style.display = "none";
 	}
 
 	let overlay = document.querySelector('.overlay');
 	switch(window.getComputedStyle(overlay).display) {
-		case "block":
+		case "flex":
 			overlay.style.display = "none";
-			if (JSON.parse(localStorage.getItem('active-screen')) != 2) disableInput = false; // Only allow input to be active if the game isn't over
+			if (storage.activeScreen != 2) localStorage.setItem('is-input-disabled', false); // Only allow input to be active if the game isn't over
 			break;
 		case "none":
-			overlay.style.display = "block";
-			disableInput = true;
+			overlay.style.display = "flex";
+			localStorage.setItem('is-input-disabled', true);
 			break;
 	}
 } // Shows/hides the currently active screen (flips between display states)
@@ -288,7 +290,7 @@ function guessWord(guess) {
 
 	if (storage.currentRow == 5 || guess == storage.solution) {
 		localStorage.setItem('active-screen', '2');
-		disableInput = true;
+		localStorage.setItem('is-input-disabled', true);
 
 		let winMessage;
 		switch(storage.currentRow) {
@@ -327,7 +329,7 @@ function restartGame() {
 
 	localStorage.setItem('current-row', '0');
 	currentGuess = "";
-	disableInput = false;
+	localStorage.setItem('is-input-disabled', false);
 	localStorage.setItem('active-screen', '0');
 
 	//changeSolution();
@@ -394,6 +396,7 @@ function initStorage() {
 	localStorage.setItem('solution-index', Math.floor(Math.random() * wordles.length)); // Index of the sharedle the player has to guess
 	localStorage.setItem('solution', wordles[new URLSearchParams(window.location.search).get('index') || storage.solutionIndex]); // Index of the sharedle the player has to guess
 	localStorage.setItem('active-screen', '0'); // Index of the sharedle the player has to guess
+	localStorage.setItem('is-input-disabled', false); // Boolean value that won't allow the user to type letters if true
 	console.log(localStorage)
 }
 
