@@ -411,9 +411,9 @@ function updateStorage(guess, states) {
 function fillInGuesses() {
 	let urlIndex = new URLSearchParams(window.location.search).get('index');
 	let hasIndexChanged = urlIndex !== null && urlIndex != JSON.parse(localStorage.getItem('solution-index'));
-	let failSafe = localStorage.getItem('current-row') == 0 && localStorage.getItem('active-screen') != 0; // Just in case a glitch has occured where the player has not started playing and the active screen is not the beginning screen upon startup
-
-	if (localStorage.getItem('guessed-words') === null || hasIndexChanged || failSafe) {
+	//let failSafe = localStorage.getItem('current-row') == 0 && localStorage.getItem('active-screen') != 0; // Just in case a glitch has occured where the player has not started playing and the active screen is not the beginning screen upon startup
+	
+	if (localStorage.getItem('guessed-words') === null || hasIndexChanged) {
 		initStorage();
 		return;
 	} // If starting values aren't defined or the game index has changed, initialize them and exit function
