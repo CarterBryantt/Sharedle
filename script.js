@@ -9,6 +9,10 @@ let disableInput,
 
 let letterDivs, keyDivs;
 
+let defaultGameWidth,
+	defaultGameHeight,
+	boardRatio;
+
 let storage = {
 	get currentRow() { return JSON.parse(localStorage.getItem('current-row')); },
 	get solutionIndex() { return JSON.parse(localStorage.getItem('solution-index')); },
@@ -20,6 +24,10 @@ function setup() {
 		disableInput = false; // Boolean value that won't allow the user to type letters if true	
 		currentGuess = ""; // String to keep track of the current word being input
 		lastLength = 0; // Last currentWord length; variable used in `update` function
+
+		defaultGameWidth = document.querySelector(".input-letters").offsetWidth; // Get initial starting height
+		defaultGameHeight = document.querySelector(".input-letters").offsetHeight; // Get initial starting height
+		boardRatio = defaultGameWidth/defaultGameHeight;
 	} // Set up variables 
 
 	{
@@ -37,6 +45,7 @@ function setup() {
 		document.addEventListener('keydown', keyPress); // Add event listener to the document to listen for keypresses
 	} // Add event listeners to divs
 
+	resizeGame();
 	fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
 	showHideScreen();
 	document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
@@ -423,25 +432,18 @@ function fillInGuesses() {
 // ------------------------------------------------------------------------
 // RESIZE GAME
 // ------------------------------------------------------------------------
-let defaultGameWidth = document.querySelector(".input-letters").offsetWidth; // Get initial starting height
-let defaultGameHeight = document.querySelector(".input-letters").offsetHeight; // Get initial starting height
-let boardRatio = defaultGameWidth/defaultGameHeight;
-let windowStartingHeight;
-window.onresize = function () {
-	let game = document.querySelector(".game");
+window.onresize = resizeGame;
+
+function resizeGame() {
 	let inputLetters = document.querySelector(".input-letters");
 
-	if (windowStartingHeight !== undefined) {
-		let windowOffset = windowStartingHeight - window.innerHeight;
-		if (windowOffset > 0) {
-			inputLetters.style.width = `${defaultGameWidth - (windowOffset*boardRatio)}px`;
-			inputLetters.style.height = `${defaultGameHeight - windowOffset}px`;
-		} // If the window got smaller
-		if (windowOffset <= 0) {
-			inputLetters.style.width = `${defaultGameWidth}px`;
-			inputLetters.style.height = `${defaultGameHeight}px`;
-		} // If the window is able to fit the game
-	}
-
-	if (game.offsetHeight == defaultGameHeight) windowStartingHeight = window.innerHeight; // Height of window when game div is no longer flex-growing
+	let windowOffset = 784 - window.innerHeight; // 784 is the total height of the header, game, and keyboard
+	if (windowOffset > 0) {
+		inputLetters.style.width = `${defaultGameWidth - (windowOffset*boardRatio)}px`;
+		inputLetters.style.height = `${defaultGameHeight - windowOffset}px`;
+	} // If the window got smaller
+	if (windowOffset <= 0) {
+		inputLetters.style.width = `${defaultGameWidth}px`;
+		inputLetters.style.height = `${defaultGameHeight}px`;
+	} // If the window is able to fit the game
 }
