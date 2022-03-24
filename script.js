@@ -329,15 +329,14 @@ function guessWord(guess) {
 function restartGame() {
 	localStorage.clear();
 
-	localStorage.setItem('current-row', '0');
+	// localStorage.setItem('current-row', '0');
 	currentGuess = "";
-	localStorage.setItem('is-input-disabled', false);
-	localStorage.setItem('active-screen', '0');
-
-	//changeSolution();
-	showHideScreen(storage.activeScreen);
+	// localStorage.setItem('is-input-disabled', false);
+	// localStorage.setItem('active-screen', '0');
 
 	initStorage();
+	showHideScreen(storage.activeScreen);
+
 	document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
 
 	for (let i = 0; i < keyDivs.length; i++) {
@@ -395,8 +394,8 @@ function initStorage() {
 	localStorage.setItem('guessed-words', JSON.stringify(new Array(6).fill(""))); // List of guessed words
 	localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
 	localStorage.setItem('current-row', '0'); // Number indicating the row the player is currently on
-	localStorage.setItem('solution-index', Math.floor(Math.random() * wordles.length)); // Index of the sharedle the player has to guess
-	localStorage.setItem('solution', wordles[new URLSearchParams(window.location.search).get('index') || storage.solutionIndex]); // Index of the sharedle the player has to guess
+	localStorage.setItem('solution-index', JSON.parse(new URLSearchParams(window.location.search).get('index')) || Math.floor(Math.random() * wordles.length)); // Index of the sharedle the player has to guess
+	localStorage.setItem('solution', wordles[storage.solutionIndex]); // Index of the sharedle the player has to guess
 	localStorage.setItem('active-screen', '0'); // Index of the sharedle the player has to guess
 	localStorage.setItem('is-input-disabled', false); // Boolean value that won't allow the user to type letters if true
 	console.log(localStorage)
@@ -414,7 +413,7 @@ function updateStorage(guess, states) {
 }
 
 function fillInGuesses() {
-	let urlIndex = new URLSearchParams(window.location.search).get('index');
+	let urlIndex = JSON.parse(new URLSearchParams(window.location.search).get('index'));
 	let hasIndexChanged = urlIndex !== null && urlIndex != JSON.parse(localStorage.getItem('solution-index'));
 	//let failSafe = localStorage.getItem('current-row') == 0 && localStorage.getItem('active-screen') != 0; // Just in case a glitch has occured where the player has not started playing and the active screen is not the beginning screen upon startup
 	
