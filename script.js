@@ -33,8 +33,11 @@ function setup() {
 	} // Set up variables 
 
 	{
-		document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', showHideScreen)); // Get close screen buttons and add click event
-		document.getElementById('menu-button').addEventListener('click', showHideScreen); // Get close screen buttons and add click event
+		document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', () => showHideScreen(storage.activeScreen))); // Get close screen buttons and add click event
+		document.getElementById('menu-button').addEventListener('click', () => showHideScreen(storage.activeScreen)); // Get close screen buttons and add click event
+		document.getElementById('contact-button').addEventListener('click', () => showHideScreen(3)); // Show contact screen when contact button is pressed
+		document.getElementById('stats-button').addEventListener('click', () => showHideScreen(4)); // Show contact screen when contact button is pressed
+		document.getElementById('info-button').addEventListener('click', () => showHideScreen(0)); // Show info screen when info button is pressed
 
 		letterDivs = document.querySelectorAll('.letter-box'); // Get letter boxes
 		keyDivs = document.querySelectorAll('.key'); // Get all keyboard keys
@@ -49,8 +52,8 @@ function setup() {
 
 	resizeGame();
 	fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
-	showHideScreen();
-	document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
+	showHideScreen(storage.activeScreen);
+	document.getElementById('wordle').innerHTML = `<b>The word was: ${storage.solution.toUpperCase()}</b>`;
 } // Get game setup
 window.onload = setup();
 
@@ -135,10 +138,10 @@ function updateWord(guess, row) {
 	lastLength = guess.length;
 } // Update word using key presses
 
-function showHideScreen() {
+function showHideScreen(screen) {
 	let screens = document.querySelectorAll('.screen');
 	for (let i = 0; i < screens.length; i++) {
-		if (i == storage.activeScreen) { screens[i].style.display = "flex"; continue; }
+		if (i == screen) { screens[i].style.display = "flex"; continue; }
 		screens[i].style.display = "none";
 	}
 
@@ -314,7 +317,7 @@ function guessWord(guess) {
 		}
 
 		setTimeout(() => displayMessage(winMessage, 3000), 2500);
-		setTimeout(showHideScreen, 5000); // Wait til all letters have flipped before showing end screen
+		setTimeout(() => showHideScreen(storage.activeScreen), 5000); // Wait til all letters have flipped before showing end screen
 		return;
 	} // This was the player's last guess and they didn't win
 
@@ -332,7 +335,7 @@ function restartGame() {
 	localStorage.setItem('active-screen', '0');
 
 	//changeSolution();
-	showHideScreen();
+	showHideScreen(storage.activeScreen);
 
 	initStorage();
 	document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;

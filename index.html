@@ -17,9 +17,15 @@
 <body>
 	<div class="container">
 		<header>
-			<span class="screen-button material-icons" id="menu-button">menu</span>
+			<div>
+				<span class="screen-button material-icons" id="menu-button">menu</span>
+				<span class="screen-button material-icons" id="contact-button">contact_support</span>
+			</div>
 			<img src="Images/Title.svg" alt="Sharedle" id="title">
-			<span class="screen-button material-icons" id="menu-button">info_outline</span>
+			<div>
+				<span class="screen-button material-icons" id="stats-button">insert_chart_outlined</span>
+				<span class="screen-button material-icons" id="info-button">info_outline</span>
+			</div>
 		</header>
 		
 		<div class="game">
@@ -110,19 +116,48 @@
 	<div class="overlay">
 		<div class="screen" id="info-screen">
 			<span class="screen-button close-button material-icons">close</span>
-			<p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae laudantium doloremque, animi odit fugit minus culpa earum soluta ullam quasi, temporibus cumque veniam quidem repellendus eius aspernatur amet, quia nobis?</p>
+			<h1>Welcome to Sharedle!</h1>
+			<p>Sharedle is a replica of the popular game created by Josh Wardle: <a href="https://www.nytimes.com/games/wordle/index.html">Wordle</a>, a game in which you attempt to find a mystery five-letter word in six guesses or less.</p>
+			<p>The rules are exaclty the same here, Sharedle just provides a few extra features that Wordle does not.</p>
+			<ul>
+				<li>The ability to play more than once a day, allowing you to hone your skills.</li>
+				<li>The ability to solve a Wordle and send it to your friends for them to complete it too.</li>
+				<li>The ability to create your own custom Wordle and send it to your friends to solve.</li>
+			</ul>
 		</div>
 
 		<div class="screen" id="play-screen">
 			<span class="screen-button close-button material-icons">close</span>
+			<h1>Hey there!</h1>
+			<h3>Glad you could make it.</h3>
+			<p>If you don't like current puzzle that's not a problem.</p>
+			<p>Just click this fancy button for a fresh round.</p>
 			<div class="button restart-button">RESTART</div>
 		</div>
 		
 		<div class="screen" id="end-screen">
 			<span class="screen-button close-button material-icons">close</span>
-			<div id="wordle"></div>
-			<div class="button restart-button">RESTART</div>
-			<div class="button" id="share-button">SHARE</div>
+			<h1>Nice job!</h1>
+			<p id="wordle"></p>
+			<h2>Up for another?</h2>
+			<div class="button restart-button">PLAY AGAIN:<span class="material-icons" style="margin-left: 10px; font-size: 30px;">replay</span></div>
+			<h2>Challenge your friends</h2>
+			<div class="button" id="share-button">SHARE:<span class="material-icons" style="margin-left: 10px; font-size: 30px;">share</span></div>
+		</div>
+
+		<div class="screen" id="contact-screen">
+			<span class="screen-button close-button material-icons">close</span>
+			<h1>Contact me:</h1>
+			<p>I'm a one-man developer so theres not really anyone to check over my work but me.</p>
+			<p>It wouldn't be suprising if you are able to find a bug in the game.</p>
+			<p>If you do, please contact me with a description or picture of the bug, alongside details on how to replicate the bug, i.e., words you guessed or buttons you pressed.</p>
+			<p>To report an issue or make a feature request you can go to the '<a href="https://github.com/CarterBryantt/Sharedle/issues">Issues</a>' tab on the <a href="https://github.com/CarterBryantt/Sharedle">github repository</a> for this project.</p>
+		</div>
+
+		<div class="screen" id="stats-screen">
+			<span class="screen-button close-button material-icons">close</span>
+			<h1>Stats will appear here:</h1>
+			<p>Woah you're so good at the game.</p>
 		</div>
 	</div>
 
