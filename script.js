@@ -326,11 +326,12 @@ function guessWord(guess) {
 }
 
 function restartGame() {
+	let tempURLParams = storage.urlParams;
 	localStorage.clear();
+	localStorage.setItem('url-params', tempURLParams);
 
 	currentGuess = "";
-	
-	localStorage.setItem('url-params', new URLSearchParams(storage.urlParams).detele('index'));
+
 	initStorage();
 	showHideScreen(storage.activeScreen);
 
@@ -386,14 +387,33 @@ async function share() {
 // ------------------------------------------------------------------------
 // LOCAL STORAGE
 // ------------------------------------------------------------------------
+// Check if there is an index in the url
+	// If there is one, check if it is the same as the one already on record or if it has changed
+	// If it has changed, change the solution index
+	// If it hasn't and it has already been used, stop using it
+
 function initStorage() {
+	console.log(`Keys: ${[...storage.urlParams.keys()]}, Values: ${[...storage.urlParams.values()]}`)
 	localStorage.setItem('guessed-words', JSON.stringify(new Array(6).fill(""))); // List of guessed words
 	localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
 	localStorage.setItem('current-row', '0'); // Number indicating the row the player is currently on
-	console.log(`URL Params: ${storage.urlParams} Value doesn't exist: ${storage.urlParams === null}, Index the same as the last: ${new URLSearchParams(window.location.search).get('index') === storage.urlParams.get('index')}`)
-	localStorage.setItem('url-params', storage.urlParams === null ? new URLSearchParams(window.location.search) : storage.urlParams); // Creates object which holds url parameters
-	localStorage.setItem('solution-index', JSON.parse(storage.urlParams.get('index')) || Math.floor(Math.random() * wordles.length)); // Index of the sharedle the player has to guess
+
+	let newURLParams = new URLSearchParams(window.location.search);
+	let newIndex = Math.floor(Math.random() * wordles.length);
+	console.log(`newURLParams: ${newURLParams}, newIndex: ${newIndex}`);
+	if (newURLParams.get('index') !== null && newURLParams.get('index') != storage.urlParams.get('index')) {
+		newIndex = JSON.parse(newURLParams.get('index'));
+	} // If there is an index in the url and it is different than the previously documented url
+	console.log(`finalIndex: ${newIndex}`);
+	// if (newURLParams.get('index') !== null && newURLParams.get('index') != storage.urlParams.get('index')) {
+	// 	newIndex = JSON.parse(newURLParams.get('index'));
+	// } // If there is an index in the url and it is the same as the previously documented url
+	// newURLParams.get('index') !== null ? newURLParams.get('index') != storage.urlParams.get('index') ? newURLParams.get('index') : Math.floor(Math.random() * wordles.length) : Math.floor(Math.random() * wordles.length)
+	localStorage.setItem('solution-index', newIndex); // Index of the sharedle the player has to guess
 	localStorage.setItem('solution', wordles[storage.solutionIndex]); // Index of the sharedle the player has to guess
+	localStorage.setItem('url-params', newURLParams); // Creates object which holds url parameters
+	console.log(`storageParams: ${storage.urlParams}`);
+
 	localStorage.setItem('active-screen', '0'); // Index of the sharedle the player has to guess
 	localStorage.setItem('is-input-disabled', false); // Boolean value that won't allow the user to type letters if true
 	console.log(localStorage)
@@ -417,6 +437,7 @@ function fillInGuesses() {
 	} // If starting values aren't defined, initialize them and exit function
 
 	let urlIndex = new URLSearchParams(window.location.search).get('index');
+	console.log(`URLIndex: ${urlIndex}, Documented: ${storage.urlParams.get('index')}`)
 	if (urlIndex != storage.urlParams.get('index')) { initStorage(); return; } // If the game index has changed, initialize the starting values and exit function
 	// -----------------------------------------
 	// EXECUTES ONLY IF GAME IS ALREADY GOING ON
