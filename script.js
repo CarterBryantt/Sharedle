@@ -1,10 +1,9 @@
-import {byDate as wordles, valid as validWords, all as allWords, futureWords} from "./word-lists.js"; // Import all word lists from word list file
+import {byDate as wordles, valid as validWords, all as allWords, futureWords, all} from "./word-lists.js"; // Import all word lists from word list file
 
 // ------------------------------------------------------------------------
 // INPUT
 // ------------------------------------------------------------------------
-let disableInput,
-	currentGuess,
+let currentGuess,
 	lastLength;
 
 let letterDivs, keyDivs;
@@ -15,6 +14,7 @@ let defaultGameWidth,
 
 let storage = {
 	get currentRow() { return JSON.parse(localStorage.getItem('current-row')); },
+	get urlParams() { return new URLSearchParams(localStorage.getItem('url-params')); },
 	get solutionIndex() { return JSON.parse(localStorage.getItem('solution-index')); },
 	get solution() { return localStorage.getItem('solution'); },
 	get activeScreen() { return JSON.parse(localStorage.getItem('active-screen')); },
@@ -23,7 +23,6 @@ let storage = {
 
 function setup() {
 	{
-		disableInput = false; // Boolean value that won't allow the user to type letters if true
 		currentGuess = ""; // String to keep track of the current word being input
 		lastLength = 0; // Last currentWord length; variable used in `update` function
 
@@ -312,14 +311,14 @@ function guessWord(guess) {
 				winMessage = "Cool!";
 				break;
 			case 5:
-				winMessage = "Close One!";
+				winMessage = guess == storage.solution ? "Close One!" : "Better Luck Next Time!";
 				break;
 		}
 
 		setTimeout(() => displayMessage(winMessage, 3000), 2500);
 		setTimeout(() => showHideScreen(storage.activeScreen), 5000); // Wait til all letters have flipped before showing end screen
 		return;
-	} // This was the player's last guess and they didn't win
+	} // If the player doesn't win or they guess the word
 
 	localStorage.setItem('active-screen', '1');
 	localStorage.setItem('current-row', storage.currentRow+1);
@@ -327,12 +326,11 @@ function guessWord(guess) {
 }
 
 function restartGame() {
+	let tempURLParams = storage.urlParams;
 	localStorage.clear();
+	localStorage.setItem('url-params', tempURLParams);
 
-	// localStorage.setItem('current-row', '0');
 	currentGuess = "";
-	// localStorage.setItem('is-input-disabled', false);
-	// localStorage.setItem('active-screen', '0');
 
 	initStorage();
 	showHideScreen(storage.activeScreen);
@@ -374,12 +372,11 @@ function generateEmojis() {
 
 async function share() {
 	let emojis = generateEmojis();
-	console.log(`Sharedle ${storage.solutionIndex} ${storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${storage.solutionIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`)
+	console.log(`Sharedle ${storage.solutionIndex} ${JSON.parse(localStorage.getItem('guessed-words'))[5] != storage.solution && storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${storage.solutionIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`)
 	try {
 		await navigator.share({
 			title: 'Sharedle',
-			text: `Sharedle ${storage.solutionIndex} ${storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${storage.solutionIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`,
-			// url: `https://carterbryantt.github.io/Sharedle/?index=${wordleIndex}`,
+			text: `Sharedle ${storage.solutionIndex} ${JSON.parse(localStorage.getItem('guessed-words'))[5] != storage.solution && storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${storage.solutionIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`
 		});
 	} catch(err) {
 		displayMessage("Sorry, an error occured when trying to share.\nPlease check your device settings or try again later.", 2000);
@@ -390,12 +387,33 @@ async function share() {
 // ------------------------------------------------------------------------
 // LOCAL STORAGE
 // ------------------------------------------------------------------------
+// Check if there is an index in the url
+	// If there is one, check if it is the same as the one already on record or if it has changed
+	// If it has changed, change the solution index
+	// If it hasn't and it has already been used, stop using it
+
 function initStorage() {
+	console.log(`Keys: ${[...storage.urlParams.keys()]}, Values: ${[...storage.urlParams.values()]}`)
 	localStorage.setItem('guessed-words', JSON.stringify(new Array(6).fill(""))); // List of guessed words
 	localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
 	localStorage.setItem('current-row', '0'); // Number indicating the row the player is currently on
-	localStorage.setItem('solution-index', JSON.parse(new URLSearchParams(window.location.search).get('index')) || Math.floor(Math.random() * wordles.length)); // Index of the sharedle the player has to guess
+
+	let newURLParams = new URLSearchParams(window.location.search);
+	let newIndex = Math.floor(Math.random() * wordles.length);
+	console.log(`newURLParams: ${newURLParams}, newIndex: ${newIndex}`);
+	if (newURLParams.get('index') !== null && newURLParams.get('index') != storage.urlParams.get('index')) {
+		newIndex = JSON.parse(newURLParams.get('index'));
+	} // If there is an index in the url and it is different than the previously documented url
+	console.log(`finalIndex: ${newIndex}`);
+	// if (newURLParams.get('index') !== null && newURLParams.get('index') != storage.urlParams.get('index')) {
+	// 	newIndex = JSON.parse(newURLParams.get('index'));
+	// } // If there is an index in the url and it is the same as the previously documented url
+	// newURLParams.get('index') !== null ? newURLParams.get('index') != storage.urlParams.get('index') ? newURLParams.get('index') : Math.floor(Math.random() * wordles.length) : Math.floor(Math.random() * wordles.length)
+	localStorage.setItem('solution-index', newIndex); // Index of the sharedle the player has to guess
 	localStorage.setItem('solution', wordles[storage.solutionIndex]); // Index of the sharedle the player has to guess
+	localStorage.setItem('url-params', newURLParams); // Creates object which holds url parameters
+	console.log(`storageParams: ${storage.urlParams}`);
+
 	localStorage.setItem('active-screen', '0'); // Index of the sharedle the player has to guess
 	localStorage.setItem('is-input-disabled', false); // Boolean value that won't allow the user to type letters if true
 	console.log(localStorage)
@@ -413,15 +431,14 @@ function updateStorage(guess, states) {
 }
 
 function fillInGuesses() {
-	let urlIndex = JSON.parse(new URLSearchParams(window.location.search).get('index'));
-	let hasIndexChanged = urlIndex !== null && urlIndex != JSON.parse(localStorage.getItem('solution-index'));
-	//let failSafe = localStorage.getItem('current-row') == 0 && localStorage.getItem('active-screen') != 0; // Just in case a glitch has occured where the player has not started playing and the active screen is not the beginning screen upon startup
-	
-	if (localStorage.getItem('guessed-words') === null || hasIndexChanged) {
-		initStorage();
-		return;
-	} // If starting values aren't defined or the game index has changed, initialize them and exit function
-	
+	let storageVariables = ['guessed-words', 'word-states', 'current-row', 'url-params', 'solution-index', 'solution', 'active-screen', 'is-input-disabled'];
+	for (let i = 0; i < storageVariables.length; i++) {
+		if (localStorage.getItem(storageVariables[i]) === null) { initStorage(); return; }
+	} // If starting values aren't defined, initialize them and exit function
+
+	let urlIndex = new URLSearchParams(window.location.search).get('index');
+	console.log(`URLIndex: ${urlIndex}, Documented: ${storage.urlParams.get('index')}`)
+	if (urlIndex != storage.urlParams.get('index')) { initStorage(); return; } // If the game index has changed, initialize the starting values and exit function
 	// -----------------------------------------
 	// EXECUTES ONLY IF GAME IS ALREADY GOING ON
 	// -----------------------------------------
