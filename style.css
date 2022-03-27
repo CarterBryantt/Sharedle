@@ -408,6 +408,21 @@ header {
 	}
 }
 
+@media (pointer:none), (pointer:coarse) {
+	#title {
+		height: 34px;
+	}
+
+	.game {
+		width: 100%;
+	}
+
+	.keyboard {
+		max-width: 100%;
+		padding: 6px 0px;
+	}
+}
+
 /* @media screen and (max-width: 499px) {
 	#title {
 		height: 34px;
