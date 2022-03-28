@@ -12,7 +12,9 @@ let defaultGameWidth,
 	defaultGameHeight,
 	boardRatio;
 
-let creating, customWord;
+let creating, customWord, customUsed;
+
+let urlIndexUsed;
 
 let storage = {
 	get currentRow() { return JSON.parse(localStorage.getItem('current-row')); },
@@ -34,6 +36,9 @@ function setup() {
 
 		creating = false; // Boolean value that tells program if player is creating their own word
 		customWord = ""; // String to hold player's custom word
+		customUsed = false; // Boolean value to keep track of if the custom word has already been played and solved
+		
+		urlIndexUsed = false; // Boolean value to keep track of if the index from the url has already been used as ta solution
 	} // Set up variables 
 
 	{
@@ -56,13 +61,14 @@ function setup() {
 
 		document.querySelectorAll('.restart-button').forEach(e => e.addEventListener('click', restartGame)); // Reset game when the restart button is clicked
 		document.getElementById('share-button').addEventListener('click', share); // Bring up share screen to share emojis
+		document.getElementById('custom-button').addEventListener('click', shareCustom); // Bring up share screen to share custom word link
 		document.addEventListener('keydown', keyPress); // Add event listener to the document to listen for keypresses
 	} // Add event listeners to divs
 
 	resizeGame();
 	fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
 	showHideScreen(storage.activeScreen);
-	document.getElementById('wordle').innerHTML = `<b>The word was: ${storage.solution.toUpperCase()}</b>`;
+	document.getElementById('wordle').innerHTML = `<b>The word was: ${storage.solution.toLowerCase()}</b>`;
 } // Get game setup
 window.onload = setup();
 
@@ -266,7 +272,7 @@ function bounceBoxes(row, interval) {
 // ALGORITHM
 // ------------------------------------------------------------------------
 function guessWord(guess) {
-	if (!allWords.includes(guess)) {
+	if (!allWords.includes(guess) && !((atob(new URLSearchParams(window.location.search).get('custom')).length == 5 ? atob(new URLSearchParams(window.location.search).get('custom')) : null) && !customUsed)) {
 		for (let i = 0; i < 5; i++) {
 			let flip = letterDivs[(5*storage.currentRow)+i].classList.contains("shake-0") ? 1 : 0; // Get animation number, so we can flip to the other one
 			letterDivs[(5*storage.currentRow)+i].classList.remove(`shake-${1^flip}`);
@@ -304,6 +310,12 @@ function guessWord(guess) {
 	if (storage.currentRow == 5 || guess == storage.solution) {
 		localStorage.setItem('active-screen', 'end');
 		localStorage.setItem('is-input-disabled', true);
+
+		let newURLParams = new URLSearchParams(window.location.search);
+		let decryptedWord = atob(newURLParams.get('custom')).length == 5 ? atob(newURLParams.get('custom')) : null;
+		let urlIndex = JSON.parse(newURLParams.get('index'));
+		if (decryptedWord !== null) customUsed = true;
+		if (urlIndex !== null) urlIndexUsed = true;
 
 		let winMessage;
 		switch(storage.currentRow) {
@@ -411,20 +423,12 @@ function initStorage() {
 	localStorage.setItem('current-row', '0'); // Number indicating the row the player is currently on
 
 	let newURLParams = new URLSearchParams(window.location.search);
-	let newIndex = Math.floor(Math.random() * wordles.length);
-	console.log(`newURLParams: ${newURLParams}, newIndex: ${newIndex}`);
-	if (newURLParams.get('index') !== null && newURLParams.get('index') != storage.urlParams.get('index')) {
-		newIndex = JSON.parse(newURLParams.get('index'));
-	} // If there is an index in the url and it is different than the previously documented url
-	console.log(`finalIndex: ${newIndex}`);
-	// if (newURLParams.get('index') !== null && newURLParams.get('index') != storage.urlParams.get('index')) {
-	// 	newIndex = JSON.parse(newURLParams.get('index'));
-	// } // If there is an index in the url and it is the same as the previously documented url
-	// newURLParams.get('index') !== null ? newURLParams.get('index') != storage.urlParams.get('index') ? newURLParams.get('index') : Math.floor(Math.random() * wordles.length) : Math.floor(Math.random() * wordles.length)
-	localStorage.setItem('solution-index', newIndex); // Index of the sharedle the player has to guess
-	localStorage.setItem('solution', wordles[storage.solutionIndex]); // Sharedle the player has to guess
+	let decryptedWord = atob(newURLParams.get('custom')).length == 5 ? atob(newURLParams.get('custom')) : null;
+	let urlIndex = JSON.parse(newURLParams.get('index'));
+	console.log(`Decrypted: ${decryptedWord}, Decrypted Used: ${customUsed}, Index: ${urlIndex}, Index Used: ${urlIndexUsed}`);
+	localStorage.setItem('solution-index', (!urlIndexUsed && urlIndex !== null && urlIndex >= 0 && urlIndex < wordles.length) ? urlIndex : Math.floor(Math.random() * wordles.length)); // Index of the sharedle the player has to guess
+	localStorage.setItem('solution', (!customUsed && decryptedWord !== null) ? decryptedWord : wordles[storage.solutionIndex]); // Sharedle the player has to guess
 	localStorage.setItem('url-params', newURLParams); // Creates object which holds url parameters
-	console.log(`storageParams: ${storage.urlParams}`);
 
 	localStorage.setItem('active-screen', 'info'); // Screen to show when the menu button is clicked
 	localStorage.setItem('is-input-disabled', false); // Boolean value that won't allow the user to type letters if true
@@ -450,14 +454,20 @@ function fillInGuesses() {
 
 	let urlIndex = new URLSearchParams(window.location.search).get('index');
 	console.log(`URLIndex: ${urlIndex}, Documented: ${storage.urlParams.get('index')}`)
-	if (urlIndex != storage.urlParams.get('index')) { initStorage(); return; } // If the game index has changed, initialize the starting values and exit function
+	if (urlIndex != storage.urlParams.get('index')) { urlIndexUsed = false; initStorage(); return; } // If the game index has changed, initialize the starting values and exit function
+
+	let urlCustom = new URLSearchParams(window.location.search).get('custom');
+	console.log(`URLCustom: ${urlCustom}, Documented: ${storage.urlParams.get('custom')}`)
+	if (urlCustom != storage.urlParams.get('custom')) { customUsed = false; initStorage(); return; } // If the custom word in the url has changed, initialize the starting values and exit function
+
+	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
+	if (guessedWords.filter(e => e != '').length == 0) { initStorage(); return; }
 	// -----------------------------------------
 	// EXECUTES ONLY IF GAME IS ALREADY GOING ON
 	// -----------------------------------------
-	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
 	let wordStates = JSON.parse(localStorage.getItem('word-states'));
 	for (let i = 0; i < guessedWords.length; i++) {
-		updateWord(guessedWords[i].toUpperCase(), i);
+		updateWord(guessedWords[i], i);
 		quickFlip(wordStates[i], i, 200);
 	}
 }
@@ -490,11 +500,7 @@ function customInput(e) {
 	if (e.type == "click") {
 		let keyDiv = e.target; // Get div clicked
 
-		if (keyDiv.classList.contains('misc-key')) {
-			if (keyDiv.id == "backspace" && customWord.length != 0) customWord = customWord.slice(0, -1); // Check if the key pressed is the backspace key, if it is, remove the last letter from the word. Also make sure there is at least 1 letter in the current guess
-
-			if (keyDiv.innerHTML == "ENTER" && customWord.length == 5) {}; // Check if the key pressed is the enter key, if it is, run the search algorithm on the word. Also check if the current guess is at least 5 letters long
-		} // Check if key pressed is a miscellaneous key or if it is the backspace icon, if it is don't add text to input word
+		if (keyDiv.id == "backspace" && customWord.length != 0) customWord = customWord.slice(0, -1); // Check if the key pressed is the backspace key, if it is, remove the last letter from the word. Also make sure there is at least 1 letter in the current guess
 
 		if (customWord.length != 5 && !keyDiv.classList.contains('misc-key')) customWord += keyDiv.innerHTML; // If current guess is not already five letters long and the div key pressed is a letter, add the letter to the current guess
 
@@ -509,8 +515,6 @@ function customInput(e) {
 		if (key.slice(0,3) != "Key" && key != "Enter" && key != "Backspace") return; // If key pressed is not a letter key, enter, or backspace, exit function
 
 		if (key == "Backspace" && customWord.length != 0) customWord = customWord.slice(0, -1); // If there is at least one letter, delete the last letter in the current guess
-		
-		if (!e.repeat && key == "Enter" && customWord.length == 5) {} // If the key is not being held down there are at least five letters, enter word
 
 		if (customWord.length != 5 && key != "Enter" && key != "Backspace") customWord += key.slice(3); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
 		
@@ -519,4 +523,20 @@ function customInput(e) {
 			customBoxes[i].innerHTML = customWord[i] || "";
 		}
 	} // If the event that triggered the function is a keypress event
+}
+
+async function shareCustom() {
+	if (customWord.length != 5) { displayMessage("Sorry, that word is not valid. Please make sure your word has 5 letters.", 2000); return; }
+
+	let encryptedLink = "https://carterbryantt.github.io/Sharedle/?custom=" + btoa(customWord.toLowerCase());
+	console.log(encryptedLink)
+	try {
+		await navigator.share({
+			title: 'Sharedle',
+			text: encryptedLink
+		});
+	} catch(err) {
+		displayMessage("Sorry, an error occured when trying to share.\nPlease check your device settings or try again later.", 2000);
+		console.log(err);
+	}
 }
