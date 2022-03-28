@@ -11,6 +11,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Alata&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Fjalla+One&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 	<link rel="stylesheet" href="style.css">
 </head>
 <script type="module" src="script.js"></script>
@@ -23,7 +24,7 @@
 			</div>
 			<img src="Images/Title.svg" alt="Sharedle" id="title">
 			<div>
-				<span class="screen-button material-icons" id="stats-button">insert_chart_outlined</span>
+				<span class="screen-button material-icons-outlined" id="create-button">create</span>
 				<span class="screen-button material-icons" id="info-button">info_outline</span>
 			</div>
 		</header>
@@ -76,41 +77,41 @@
 		</div>
 
 		<div class="keyboard">
-				<div class="row row-one">
-					<div class="key">Q</div>
-					<div class="key">W</div>
-					<div class="key">E</div>
-					<div class="key">R</div>
-					<div class="key">T</div>
-					<div class="key">Y</div>
-					<div class="key">U</div>
-					<div class="key">I</div>
-					<div class="key">O</div>
-					<div class="key">P</div>
-				</div>
-				<div class="row row-two">
-					<div class="key">A</div>
-					<div class="key">S</div>
-					<div class="key">D</div>
-					<div class="key">F</div>
-					<div class="key">G</div>
-					<div class="key">H</div>
-					<div class="key">J</div>
-					<div class="key">K</div>
-					<div class="key">L</div>
-				</div>
-				<div class="row row-three">
-					<div class="key misc-key">ENTER</div>
-					<div class="key">Z</div>
-					<div class="key">X</div>
-					<div class="key">C</div>
-					<div class="key">V</div>
-					<div class="key">B</div>
-					<div class="key">N</div>
-					<div class="key">M</div>
-					<div class="key misc-key material-icons" id="backspace">backspace</div>
-				</div>
+			<div class="row row-one">
+				<div class="key">Q</div>
+				<div class="key">W</div>
+				<div class="key">E</div>
+				<div class="key">R</div>
+				<div class="key">T</div>
+				<div class="key">Y</div>
+				<div class="key">U</div>
+				<div class="key">I</div>
+				<div class="key">O</div>
+				<div class="key">P</div>
 			</div>
+			<div class="row row-two">
+				<div class="key">A</div>
+				<div class="key">S</div>
+				<div class="key">D</div>
+				<div class="key">F</div>
+				<div class="key">G</div>
+				<div class="key">H</div>
+				<div class="key">J</div>
+				<div class="key">K</div>
+				<div class="key">L</div>
+			</div>
+			<div class="row row-three">
+				<div class="key misc-key">ENTER</div>
+				<div class="key">Z</div>
+				<div class="key">X</div>
+				<div class="key">C</div>
+				<div class="key">V</div>
+				<div class="key">B</div>
+				<div class="key">N</div>
+				<div class="key">M</div>
+				<div class="key misc-key material-icons" id="backspace">backspace</div>
+			</div>
+		</div>
 	</div>
 	
 	<div class="overlay">
@@ -154,10 +155,55 @@
 			<p>To report an issue or make a feature request you can go to the '<a href="https://github.com/CarterBryantt/Sharedle/issues">Issues</a>' tab on the <a href="https://github.com/CarterBryantt/Sharedle">github repository</a> for this project.</p>
 		</div>
 
-		<div class="screen" id="stats-screen">
+		<div class="screen" id="create-screen">
 			<span class="screen-button close-button material-icons">close</span>
-			<h1>Stats will appear here:</h1>
-			<p>Woah you're so good at the game.</p>
+			<h1>Create your own:</h1>
+			<div class="create-row">
+				<div class="create-box"></div>
+				<div class="create-box"></div>
+				<div class="create-box"></div>
+				<div class="create-box"></div>
+				<div class="create-box"></div>
+			</div>
+
+			<div class="tiny-keyboard">
+				<div class="row row-one">
+					<div class="tiny-key">Q</div>
+					<div class="tiny-key">W</div>
+					<div class="tiny-key">E</div>
+					<div class="tiny-key">R</div>
+					<div class="tiny-key">T</div>
+					<div class="tiny-key">Y</div>
+					<div class="tiny-key">U</div>
+					<div class="tiny-key">I</div>
+					<div class="tiny-key">O</div>
+					<div class="tiny-key">P</div>
+				</div>
+				<div class="row row-two">
+					<div class="tiny-key">A</div>
+					<div class="tiny-key">S</div>
+					<div class="tiny-key">D</div>
+					<div class="tiny-key">F</div>
+					<div class="tiny-key">G</div>
+					<div class="tiny-key">H</div>
+					<div class="tiny-key">J</div>
+					<div class="tiny-key">K</div>
+					<div class="tiny-key">L</div>
+				</div>
+				<div class="row row-three">
+					<div class="tiny-key">Z</div>
+					<div class="tiny-key">X</div>
+					<div class="tiny-key">C</div>
+					<div class="tiny-key">V</div>
+					<div class="tiny-key">B</div>
+					<div class="tiny-key">N</div>
+					<div class="tiny-key">M</div>
+					<div class="tiny-key misc-key material-icons" id="backspace">backspace</div>
+				</div>
+			</div>
+			
+			<h2>Send it to a friend!</h>
+			<div class="button" id="share-button">SHARE:<span class="material-icons" style="margin-left: 10px; font-size: 30px;">share</span></div>
 		</div>
 	</div>
 

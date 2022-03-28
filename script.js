@@ -6,18 +6,20 @@ import {byDate as wordles, valid as validWords, all as allWords, futureWords, al
 let currentGuess,
 	lastLength;
 
-let letterDivs, keyDivs;
+let letterDivs, keyDivs, tinyKeyDivs;
 
 let defaultGameWidth,
 	defaultGameHeight,
 	boardRatio;
+
+let creating, customWord;
 
 let storage = {
 	get currentRow() { return JSON.parse(localStorage.getItem('current-row')); },
 	get urlParams() { return new URLSearchParams(localStorage.getItem('url-params')); },
 	get solutionIndex() { return JSON.parse(localStorage.getItem('solution-index')); },
 	get solution() { return localStorage.getItem('solution'); },
-	get activeScreen() { return JSON.parse(localStorage.getItem('active-screen')); },
+	get activeScreen() { return localStorage.getItem('active-screen'); },
 	get isInputDisabled() { return JSON.parse(localStorage.getItem('is-input-disabled')); }
 }
 
@@ -29,19 +31,27 @@ function setup() {
 		defaultGameWidth = document.querySelector(".input-letters").offsetWidth; // Get initial starting height
 		defaultGameHeight = document.querySelector(".input-letters").offsetHeight; // Get initial starting height
 		boardRatio = defaultGameWidth/defaultGameHeight;
+
+		creating = false; // Boolean value that tells program if player is creating their own word
+		customWord = ""; // String to hold player's custom word
 	} // Set up variables 
 
 	{
-		document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', () => showHideScreen(storage.activeScreen))); // Get close screen buttons and add click event
+		document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', () => { showHideScreen(storage.activeScreen); creating = false; customWord = ""; })); // Get close screen buttons and add click event
 		document.getElementById('menu-button').addEventListener('click', () => showHideScreen(storage.activeScreen)); // Get close screen buttons and add click event
-		document.getElementById('contact-button').addEventListener('click', () => showHideScreen(3)); // Show contact screen when contact button is pressed
-		document.getElementById('stats-button').addEventListener('click', () => showHideScreen(4)); // Show contact screen when contact button is pressed
-		document.getElementById('info-button').addEventListener('click', () => showHideScreen(0)); // Show info screen when info button is pressed
+		document.getElementById('contact-button').addEventListener('click', () => showHideScreen('contact')); // Show contact screen when contact button is pressed
+		document.getElementById('create-button').addEventListener('click', () => { showHideScreen('create'); creating = true; }); // Show create screen when create button is pressed
+		document.getElementById('info-button').addEventListener('click', () => showHideScreen('info')); // Show info screen when info button is pressed
 
 		letterDivs = document.querySelectorAll('.letter-box'); // Get letter boxes
 		keyDivs = document.querySelectorAll('.key'); // Get all keyboard keys
 		for (let i = 0; i < keyDivs.length; i++) {
 			keyDivs[i].addEventListener('click', keyPress);
+		} // Add event listener to all key divs to listen for mouse clicks
+
+		tinyKeyDivs = document.querySelectorAll('.tiny-key'); // Get all keyboard keys
+		for (let i = 0; i < tinyKeyDivs.length; i++) {
+			tinyKeyDivs[i].addEventListener('click', keyPress);
 		} // Add event listener to all key divs to listen for mouse clicks
 
 		document.querySelectorAll('.restart-button').forEach(e => e.addEventListener('click', restartGame)); // Reset game when the restart button is clicked
@@ -57,7 +67,9 @@ function setup() {
 window.onload = setup();
 
 function keyPress(e) {
-	if (storage.isInputDisabled || document.activeElement == document.getElementById('password')) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
+	if (creating) { customInput(e); return; } // If the player is creating a word, use custon word input and exit function (exiting may not be necessary but just in case)
+
+	if (storage.isInputDisabled); // If input is disabled because the end screen is displayed or if the password is being entered, exit function
 	
 	if (e.type == "click") {
 		let keyDiv = e.target; // Get div clicked
@@ -140,7 +152,7 @@ function updateWord(guess, row) {
 function showHideScreen(screen) {
 	let screens = document.querySelectorAll('.screen');
 	for (let i = 0; i < screens.length; i++) {
-		if (i == screen) { screens[i].style.display = "flex"; continue; }
+		if (screens[i].id.slice(0, -7) == screen) { screens[i].style.display = "flex"; continue; }
 		screens[i].style.display = "none";
 	}
 
@@ -148,7 +160,7 @@ function showHideScreen(screen) {
 	switch(window.getComputedStyle(overlay).display) {
 		case "flex":
 			overlay.style.display = "none";
-			if (storage.activeScreen != 2) localStorage.setItem('is-input-disabled', false); // Only allow input to be active if the game isn't over
+			if (storage.activeScreen != 'end') localStorage.setItem('is-input-disabled', false); // Only allow input to be active if the game isn't over
 			break;
 		case "none":
 			overlay.style.display = "flex";
@@ -290,7 +302,7 @@ function guessWord(guess) {
 	flipBox(boxColors, 0, storage.currentRow, guess == storage.solution); // Flip first box
 
 	if (storage.currentRow == 5 || guess == storage.solution) {
-		localStorage.setItem('active-screen', '2');
+		localStorage.setItem('active-screen', 'end');
 		localStorage.setItem('is-input-disabled', true);
 
 		let winMessage;
@@ -320,7 +332,7 @@ function guessWord(guess) {
 		return;
 	} // If the player doesn't win or they guess the word
 
-	localStorage.setItem('active-screen', '1');
+	localStorage.setItem('active-screen', 'play');
 	localStorage.setItem('current-row', storage.currentRow+1);
 	currentGuess = ""; // Clear current guess
 }
@@ -410,11 +422,11 @@ function initStorage() {
 	// } // If there is an index in the url and it is the same as the previously documented url
 	// newURLParams.get('index') !== null ? newURLParams.get('index') != storage.urlParams.get('index') ? newURLParams.get('index') : Math.floor(Math.random() * wordles.length) : Math.floor(Math.random() * wordles.length)
 	localStorage.setItem('solution-index', newIndex); // Index of the sharedle the player has to guess
-	localStorage.setItem('solution', wordles[storage.solutionIndex]); // Index of the sharedle the player has to guess
+	localStorage.setItem('solution', wordles[storage.solutionIndex]); // Sharedle the player has to guess
 	localStorage.setItem('url-params', newURLParams); // Creates object which holds url parameters
 	console.log(`storageParams: ${storage.urlParams}`);
 
-	localStorage.setItem('active-screen', '0'); // Index of the sharedle the player has to guess
+	localStorage.setItem('active-screen', 'info'); // Screen to show when the menu button is clicked
 	localStorage.setItem('is-input-disabled', false); // Boolean value that won't allow the user to type letters if true
 	console.log(localStorage)
 }
@@ -469,4 +481,42 @@ function resizeGame() {
 		inputLetters.style.width = `${defaultGameWidth}px`;
 		inputLetters.style.height = `${defaultGameHeight}px`;
 	} // If the window is able to fit the game
+}
+
+// ------------------------------------------------------------------------
+// CREATE SCREEN
+// ------------------------------------------------------------------------
+function customInput(e) {
+	if (e.type == "click") {
+		let keyDiv = e.target; // Get div clicked
+
+		if (keyDiv.classList.contains('misc-key')) {
+			if (keyDiv.id == "backspace" && customWord.length != 0) customWord = customWord.slice(0, -1); // Check if the key pressed is the backspace key, if it is, remove the last letter from the word. Also make sure there is at least 1 letter in the current guess
+
+			if (keyDiv.innerHTML == "ENTER" && customWord.length == 5) {}; // Check if the key pressed is the enter key, if it is, run the search algorithm on the word. Also check if the current guess is at least 5 letters long
+		} // Check if key pressed is a miscellaneous key or if it is the backspace icon, if it is don't add text to input word
+
+		if (customWord.length != 5 && !keyDiv.classList.contains('misc-key')) customWord += keyDiv.innerHTML; // If current guess is not already five letters long and the div key pressed is a letter, add the letter to the current guess
+
+		let customBoxes = document.querySelectorAll('.create-box');
+		for (let i = 0; i < customBoxes.length; i++) {
+			customBoxes[i].innerHTML = customWord[i] || "";
+		}
+	} // If the event that triggered the function is a click event
+	if (e.type == "keydown") {
+		let key = e.code; // Get key pressed
+		
+		if (key.slice(0,3) != "Key" && key != "Enter" && key != "Backspace") return; // If key pressed is not a letter key, enter, or backspace, exit function
+
+		if (key == "Backspace" && customWord.length != 0) customWord = customWord.slice(0, -1); // If there is at least one letter, delete the last letter in the current guess
+		
+		if (!e.repeat && key == "Enter" && customWord.length == 5) {} // If the key is not being held down there are at least five letters, enter word
+
+		if (customWord.length != 5 && key != "Enter" && key != "Backspace") customWord += key.slice(3); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
+		
+		let customBoxes = document.querySelectorAll('.create-box');
+		for (let i = 0; i < customBoxes.length; i++) {
+			customBoxes[i].innerHTML = customWord[i] || "";
+		}
+	} // If the event that triggered the function is a keypress event
 }
