@@ -63,6 +63,7 @@ function setup() {
 		document.getElementById('share-button').addEventListener('click', share); // Bring up share screen to share emojis
 		document.getElementById('custom-button').addEventListener('click', shareCustom); // Bring up share screen to share custom word link
 		document.addEventListener('keydown', keyPress); // Add event listener to the document to listen for keypresses
+		document.getElementById('hard-reset').addEventListener('click', () => localStorage.clear()); // Clear all local storage so user can hard reset the game
 	} // Add event listeners to divs
 
 	resizeGame();
