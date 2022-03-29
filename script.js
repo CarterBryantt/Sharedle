@@ -511,7 +511,7 @@ function customInput(e) {
 
 		if (key == "Backspace" && customWord.length != 0) customWord = customWord.slice(0, -1); // If there is at least one letter, delete the last letter in the current guess
 
-		if (customWord.length != 5 && key != "Enter" && key != "Backspace") customWord += key.slice(3); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
+		if (customWord.length != 5 && key != "Enter" && key != "Backspace") customWord += key.slice(3).toLowerCase(); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
 		
 		let customBoxes = document.querySelectorAll('.create-box');
 		for (let i = 0; i < customBoxes.length; i++) {
