@@ -534,3 +534,15 @@ async function shareCustom() {
 		console.log(err);
 	}
 }
+
+// ------------------------------------------------------------------------
+// THEME SELECTOR
+// ------------------------------------------------------------------------
+function selectTheme() {
+	let curvedSystem = ['#eee3e3', '#bbb0b1', '#8a8181', '#5d5454', '#332b2b', '#282121'];
+	let tacticMixture = ['#ad98a9', '#56515b', '#807482', '#46434d', '#323036', '#debdd0'];
+
+	for (let i = 0; i < 6; i++) {
+		document.documentElement.style.setProperty(`--color-shade-${i+1}`, curvedSystem[i]);
+	}
+}

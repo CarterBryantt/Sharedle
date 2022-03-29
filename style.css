@@ -225,8 +225,8 @@ header {
 	height: 58px;
 	margin-left: 3px;
 	margin-right: 3px;
-	background-color: hsl(0, 0%, 95%);
-	border: solid 2px hsl(0, 0%, 60%);
+	background-color: var(--color-shade-2);
+	border: solid 2px var(--color-shade-5);
 	border-radius: 6px;
 
 	display: flex;
@@ -237,6 +237,7 @@ header {
 	font-size: 16px;
 	font-weight: bold;
 	text-align: center;
+	color: var(--color-shade-6);
 	
 	cursor: pointer;
 }
@@ -247,12 +248,13 @@ header {
 }
 
 .key:hover {
-	background-color: hsl(0, 0%, 85%);
-	border: solid 2px hsl(0, 0%, 50%);
+	background-color: var(--color-shade-1);
+	border: solid 2px var(--color-shade-4);
 }
 
 .key:active {
-	background-color: hsl(0, 0%, 70%);
+	filter: brightness(90%);
+	background-color: var(--color-shade-1);
 }
 
 .misc-key {
