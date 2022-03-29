@@ -69,7 +69,7 @@ function setup() {
 	resizeGame();
 	fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
 	showHideScreen(storage.activeScreen);
-	document.getElementById('wordle').innerHTML = `<b>The word was: ${storage.solution.toLowerCase()}</b>`;
+	document.getElementById('wordle').innerHTML = `<b>The word was: ${storage.solution.toUpperCase()}</b>`;
 } // Get game setup
 window.onload = setup();
 
