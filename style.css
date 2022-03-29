@@ -233,6 +233,7 @@ header {
 	justify-content: center;
 	align-items: center;
 
+	text-transform: uppercase;
 	font-size: 16px;
 	font-weight: bold;
 	text-align: center;
@@ -257,6 +258,7 @@ header {
 .misc-key {
 	width: 50px;
 	font-size: 12px;
+	text-transform: none;
 }
 
 /* OVERLAY */

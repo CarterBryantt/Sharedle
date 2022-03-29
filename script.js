@@ -84,7 +84,7 @@ function keyPress(e) {
 		if (keyDiv.classList.contains('misc-key')) {
 			if (keyDiv.id == "backspace" && currentGuess.length != 0) currentGuess = currentGuess.slice(0, -1); // Check if the key pressed is the backspace key, if it is, remove the last letter from the word. Also make sure there is at least 1 letter in the current guess
 
-			if (keyDiv.innerHTML == "ENTER" && currentGuess.length == 5) guessWord(currentGuess.toLowerCase()); // Check if the key pressed is the enter key, if it is, run the search algorithm on the word. Also check if the current guess is at least 5 letters long
+			if (keyDiv.innerHTML == "ENTER" && currentGuess.length == 5) guessWord(currentGuess); // Check if the key pressed is the enter key, if it is, run the search algorithm on the word. Also check if the current guess is at least 5 letters long
 			updateWord(currentGuess, storage.currentRow); // Display new word
 			return;
 		} // Check if key pressed is a miscellaneous key or if it is the backspace icon, if it is don't add text to input word
@@ -99,10 +99,10 @@ function keyPress(e) {
 		if (key.slice(0,3) != "Key" && key != "Enter" && key != "Backspace") return; // If key pressed is not a letter key, enter, or backspace, exit function
 
 		if (key == "Backspace" && currentGuess.length != 0) currentGuess = currentGuess.slice(0, -1); // If there is at least one letter, delete the last letter in the current guess
-		
-		if (!e.repeat && key == "Enter" && currentGuess.length == 5) guessWord(currentGuess.toLowerCase()); // If the key is not being held down there are at least five letters, enter word
 
-		if (currentGuess.length != 5 && key != "Enter" && key != "Backspace") currentGuess += key.slice(3); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
+		if (!e.repeat && key == "Enter" && currentGuess.length == 5) guessWord(currentGuess); // If the key is not being held down there are at least five letters, enter word
+
+		if (currentGuess.length != 5 && key != "Enter" && key != "Backspace") currentGuess += key.slice(3).toLowerCase(); // If the key pressed is not enter or backspace, remove "Key" from the string so that you are just left with the letter (KeyA - Key = A) and add it to the current guess
 
 		if (storage.currentRow != 6) updateWord(currentGuess, storage.currentRow); // Display new word
 	} // If the event that triggered the function is a keypress event
@@ -397,7 +397,6 @@ function generateEmojis() {
 
 async function share() {
 	let emojis = generateEmojis();
-	console.log(`Sharedle ${storage.solutionIndex} ${JSON.parse(localStorage.getItem('guessed-words'))[5] != storage.solution && storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${storage.solutionIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`)
 	try {
 		await navigator.share({
 			title: 'Sharedle',
@@ -418,7 +417,6 @@ async function share() {
 	// If it hasn't and it has already been used, stop using it
 
 function initStorage() {
-	console.log(`Keys: ${[...storage.urlParams.keys()]}, Values: ${[...storage.urlParams.values()]}`)
 	localStorage.setItem('guessed-words', JSON.stringify(new Array(6).fill(""))); // List of guessed words
 	localStorage.setItem('word-states', JSON.stringify(new Array(6).fill(""))); // List of letter states for each word
 	localStorage.setItem('current-row', '0'); // Number indicating the row the player is currently on
@@ -426,14 +424,12 @@ function initStorage() {
 	let newURLParams = new URLSearchParams(window.location.search);
 	let decryptedWord = atob(newURLParams.get('custom')).length == 5 ? atob(newURLParams.get('custom')) : null;
 	let urlIndex = JSON.parse(newURLParams.get('index'));
-	console.log(`Decrypted: ${decryptedWord}, Decrypted Used: ${customUsed}, Index: ${urlIndex}, Index Used: ${urlIndexUsed}`);
 	localStorage.setItem('solution-index', (!urlIndexUsed && urlIndex !== null && urlIndex >= 0 && urlIndex < wordles.length) ? urlIndex : Math.floor(Math.random() * wordles.length)); // Index of the sharedle the player has to guess
 	localStorage.setItem('solution', (!customUsed && decryptedWord !== null) ? decryptedWord : wordles[storage.solutionIndex]); // Sharedle the player has to guess
 	localStorage.setItem('url-params', newURLParams); // Creates object which holds url parameters
 
 	localStorage.setItem('active-screen', 'info'); // Screen to show when the menu button is clicked
 	localStorage.setItem('is-input-disabled', false); // Boolean value that won't allow the user to type letters if true
-	console.log(localStorage)
 }
 
 function updateStorage(guess, states) {
@@ -454,11 +450,9 @@ function fillInGuesses() {
 	} // If starting values aren't defined, initialize them and exit function
 
 	let urlIndex = new URLSearchParams(window.location.search).get('index');
-	console.log(`URLIndex: ${urlIndex}, Documented: ${storage.urlParams.get('index')}`)
 	if (urlIndex != storage.urlParams.get('index')) { urlIndexUsed = false; initStorage(); return; } // If the game index has changed, initialize the starting values and exit function
 
 	let urlCustom = new URLSearchParams(window.location.search).get('custom');
-	console.log(`URLCustom: ${urlCustom}, Documented: ${storage.urlParams.get('custom')}`)
 	if (urlCustom != storage.urlParams.get('custom')) { customUsed = false; initStorage(); return; } // If the custom word in the url has changed, initialize the starting values and exit function
 
 	let guessedWords = JSON.parse(localStorage.getItem('guessed-words'));
@@ -529,8 +523,7 @@ function customInput(e) {
 async function shareCustom() {
 	if (customWord.length != 5) { displayMessage("Sorry, that word is not valid. Please make sure your word has 5 letters.", 2000); return; }
 
-	let encryptedLink = "https://carterbryantt.github.io/Sharedle/?custom=" + btoa(customWord.toLowerCase());
-	console.log(encryptedLink)
+	let encryptedLink = "https://carterbryantt.github.io/Sharedle/?custom=" + btoa(customWord);
 	try {
 		await navigator.share({
 			title: 'Sharedle',
