@@ -10,6 +10,13 @@
 	--present: #b59f3b;
 	--absent: #3a3a3c;
 
+	--color-shade-1: #eee3e3;
+	--color-shade-2: #bbb0b1;
+	--color-shade-3: #8a8181;
+	--color-shade-4: #5d5454;
+	--color-shade-5: #332b2b;
+	--color-shade-6: #282121;
+
 	--max-game-width: 500px;
 	
 	font-family: Arial, sans-serif;
@@ -119,7 +126,7 @@ header {
 	font-weight: bold;
 	text-align: center;
 	font-size: min(4vh, 58px);
-	color: white;
+	color: #ffffff;
 }
 
 .flip {
@@ -271,7 +278,7 @@ header {
 	width: 260px;
 	height: 380px;
 	position: relative;
-	background-color: #707375;
+	background-color: var(--color-shade-4);
 	border: inset 5px #47484e;
 	border-radius: 12px;
 	padding: 10px 0px;
@@ -287,7 +294,7 @@ header {
 	width: 240px;
 	height: 60px;
 	margin: 0px;
-	background-color: #377937;
+	background-color: #659252;
 	border-radius: 6px;
 
 	display: flex;
@@ -317,7 +324,7 @@ header {
 
 #info-screen, #contact-screen, #create-screen {
 	width: 400px;
-	height: 450px;
+	height: fit-content;
 }
 
 .screen-button {
@@ -337,7 +344,7 @@ header {
 	position: absolute;
 	bottom: 15px;
 
-	background-color: #212122;
+	background-color: var(--dark-grey);
 	color: #d4cdcd;
 	
 	cursor: pointer;
@@ -384,6 +391,16 @@ header {
 }
 
 /* CUSTOM WORD */
+.custom-input {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	padding: 6px;
+	border: solid 5px #1e1f20;
+}
+
 .create-row {
 	--border-width: 3px;
 	--row-gap: 5px;
@@ -393,11 +410,15 @@ header {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+
+	padding: 5px;
+	border-bottom: solid 5px #1e1f20;
 }
 
 .create-box {
 	width: calc(var(--box-size) - calc(var(--border-width)*2) - var(--row-gap));
-	border: solid var(--border-width) var(--border-dark);
+	border: solid var(--border-width) var(--color-shade-6);
+	background-color: var(--color-shade-1);
 
 	display: flex;
 	align-items: center;
@@ -407,11 +428,11 @@ header {
 	font-weight: bold;
 	text-align: center;
 	font-size: 2rem;
-	color: white;
+	color: #363434;
 }
 
 .tiny-keyboard {
-	padding: 6px 0px;
+	padding: 6px 0px 0px 0px;
 	
 	display: flex;
 	flex-direction: column;
@@ -423,8 +444,8 @@ header {
 	height: 32px;
 	margin-left: 3px;
 	margin-right: 3px;
-	background-color: hsl(0, 0%, 95%);
-	border: solid 2px hsl(0, 0%, 60%);
+	background-color: var(--color-shade-2);
+	border: solid 2px var(--color-shade-5);
 	border-radius: 6px;
 
 	display: flex;
@@ -434,6 +455,7 @@ header {
 	font-size: 16px;
 	font-weight: bold;
 	text-align: center;
+	color: var(--color-shade-6);
 	
 	cursor: pointer;
 }
@@ -492,145 +514,3 @@ header {
 		padding: 6px 0px;
 	}
 }
-
-/* @media screen and (max-width: 499px) {
-	#title {
-		height: 34px;
-	}
-
-	.game {
-		width: 100%;
-	}
-
-	.keyboard {
-		max-width: 100%;
-		padding: 6px 0px;
-	}
-} */
-
-/* @media screen and (max-width: 620px) {
-	p {
-		padding: 0px 7.5px;
-		font-size: 12.5px;
-	}
-
-	.container {
-		width: 250px;
-	}
-
-	.game {
-		width: 250px;
-	}
-
-	.input-letters {
-		width: 250px;
-		grid-template-columns: repeat(5, 47.6px);
-		column-gap: 3px;
-		row-gap: 3px;
-	}
-	
-	.letter-box {
-		width: 41.6px;
-		height: 41.6px;
-		
-		font-size: 31.5px;
-		line-height: 41px;
-	}
-	
-	#absent-letters {
-		width: 112.5px;
-		min-height: 45px;
-		padding: 6.25px;
-	}
-
-	.absent-letter {
-		width: 16.25px;
-		height: 16.25px;
-		margin: 1.25px;
-		border: solid 1.875px var(--grey);
-
-		font-size: 14px;
-		line-height: 18px;
-	}
-	
-	.settings {
-		width: 125px;
-	}
-	
-	.keyboard {
-		width: 250px;
-		padding: 3.75px 0px;
-	}
-	
-	.key {
-		width: 18.75px;
-		height: 22.5px;
-		margin-left: 1.875px;
-		margin-right: 1.875px;
-		
-		font-size: 8.8px;
-		line-height: 23px;
-	}
-	
-	.misc-key {
-		width: 31.25px;
-		font-size: 7.5px;
-	}
-	
-	.material-icons {
-		font-size: 13.2px;
-		line-height: 22.5px;
-	}
-
-	.screen {
-		width: 162.5px;
-		height: 268.75px;
-		margin: 62.5px auto;
-		padding: 6.25px 0px;
-		row-gap: 6.25px;
-	}
-
-	#wordle {
-		width: 150px;
-		height: 18.75px;
-		
-		font-size: 12.5px;
-	}
-
-	.button {
-		width: 150px;
-		height: 37.5px;
-
-		line-height: 37.5px;
-		font-size: 21.8px;
-	}
-
-	#wordle-index {
-		width: 70%;
-		height: 25%;
-
-		font-size: 33.75px;
-	}
-
-	#select-wordle-button {
-		height: 12.5px;
-
-		font-size: 10px;
-		line-height: 14px;
-	}
-
-	.message-container {
-		row-gap: 6.25px;
-	}
-
-	.popup {
-		padding: 6.25px;
-		border-radius: 7.5px;
-
-		font-size: 12.5px;
-	}
-
-	.popup:nth-child(1) {
-		margin-top: 33px;
-	}
-} */

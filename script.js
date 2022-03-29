@@ -273,7 +273,7 @@ function bounceBoxes(row, interval) {
 // ALGORITHM
 // ------------------------------------------------------------------------
 function guessWord(guess) {
-	if (!allWords.includes(guess) && !((atob(new URLSearchParams(window.location.search).get('custom')).length == 5 ? atob(new URLSearchParams(window.location.search).get('custom')) : null) && !customUsed)) {
+	if (!allWords.includes(guess) && !(guess == storage.solution && !customUsed)) {
 		for (let i = 0; i < 5; i++) {
 			let flip = letterDivs[(5*storage.currentRow)+i].classList.contains("shake-0") ? 1 : 0; // Get animation number, so we can flip to the other one
 			letterDivs[(5*storage.currentRow)+i].classList.remove(`shake-${1^flip}`);
@@ -503,7 +503,7 @@ function customInput(e) {
 
 		if (keyDiv.id == "backspace" && customWord.length != 0) customWord = customWord.slice(0, -1); // Check if the key pressed is the backspace key, if it is, remove the last letter from the word. Also make sure there is at least 1 letter in the current guess
 
-		if (customWord.length != 5 && !keyDiv.classList.contains('misc-key')) customWord += keyDiv.innerHTML; // If current guess is not already five letters long and the div key pressed is a letter, add the letter to the current guess
+		if (customWord.length != 5 && keyDiv.id != "backspace") customWord += keyDiv.innerHTML; // If current guess is not already five letters long and the div key pressed is a letter, add the letter to the current guess
 
 		let customBoxes = document.querySelectorAll('.create-box');
 		for (let i = 0; i < customBoxes.length; i++) {
