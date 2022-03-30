@@ -21,9 +21,11 @@
 			<div>
 				<span class="screen-button material-icons" id="menu-button">menu</span>
 				<span class="screen-button material-icons" id="contact-button">contact_support</span>
+				<span class="screen-button material-icons-outlined" id="settings-button">settings</span>
 			</div>
 			<img src="Images/Title.svg" alt="Sharedle" id="title">
 			<div>
+				<span class="screen-button material-icons-outlined" id="stats-button">analytics</span>
 				<span class="screen-button material-icons-outlined" id="create-button">create</span>
 				<span class="screen-button material-icons" id="info-button">info_outline</span>
 			</div>
@@ -210,6 +212,21 @@
 			
 			<h2>Send it to a friend!</h2>
 			<div class="button" id="custom-button">SHARE:<span class="material-icons" style="margin-left: 10px; margin-bottom: 3px; font-size: 30px; transform: scale(-1, 1);">reply</span></div>
+		</div>
+
+		<div class="screen" id="stats-screen">
+			<span class="screen-button close-button material-icons">close</span>
+			<h1>Stats will appear here:</h1>
+			<p>Woah you're so good at the game.</p>
+		</div>
+
+		<div class="screen" id="settings-screen">
+			<span class="screen-button close-button material-icons">close</span>
+			<h1>Config:</h1>
+			<select name="theme" id="theme-select">
+				<option value="curved-system">Curved System</option>
+				<option value="tactic-mixture">Tactic Mixture</option>
+			</select>
 		</div>
 
 		<div id="hard-reset">If you are unable to click anything and there isn't a menu here to close this screen, click this to hard reset the game.</br>This will cause any shared words not to be processed so you will need to re-open those links.</div>

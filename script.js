@@ -45,6 +45,8 @@ function setup() {
 		document.querySelectorAll('.close-button').forEach(e => e.addEventListener('click', () => { showHideScreen(storage.activeScreen); creating = false; customWord = ""; })); // Get close screen buttons and add click event
 		document.getElementById('menu-button').addEventListener('click', () => showHideScreen(storage.activeScreen)); // Get close screen buttons and add click event
 		document.getElementById('contact-button').addEventListener('click', () => showHideScreen('contact')); // Show contact screen when contact button is pressed
+		document.getElementById('settings-button').addEventListener('click', () => showHideScreen('settings')); // Show settings screen when settings button is pressed
+		document.getElementById('stats-button').addEventListener('click', () => showHideScreen('stats')); // Show stats screen when stats button is pressed
 		document.getElementById('create-button').addEventListener('click', () => { showHideScreen('create'); creating = true; }); // Show create screen when create button is pressed
 		document.getElementById('info-button').addEventListener('click', () => showHideScreen('info')); // Show info screen when info button is pressed
 
@@ -538,11 +540,12 @@ async function shareCustom() {
 // ------------------------------------------------------------------------
 // THEME SELECTOR
 // ------------------------------------------------------------------------
-function selectTheme() {
+document.getElementById('theme-select').onchange = function() {
+	document.getElementById('theme-select')
 	let curvedSystem = ['#eee3e3', '#bbb0b1', '#8a8181', '#5d5454', '#332b2b', '#282121'];
 	let tacticMixture = ['#ad98a9', '#56515b', '#807482', '#46434d', '#323036', '#debdd0'];
 
 	for (let i = 0; i < 6; i++) {
-		document.documentElement.style.setProperty(`--color-shade-${i+1}`, curvedSystem[i]);
+		document.documentElement.style.setProperty(`--color-shade-${i+1}`, [curvedSystem, tacticMixture][document.getElementById('theme-select').selectedIndex][i]);
 	}
 }
