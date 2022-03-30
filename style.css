@@ -61,6 +61,29 @@ li {
 	font-size: 17px;
 }
 
+#info-screen > ul > li::before {
+	margin-right: 10px;
+	font-family: 'Material Icons Outlined';
+}
+
+#info-screen > ul > li:nth-child(1)::before {
+	content: 'cached';
+}
+
+#info-screen > ul > li:nth-child(2)::before {
+	display: inline-block;
+	transform: scale(-1, 1);
+	content: 'reply';
+}
+
+#info-screen > ul > li:nth-child(3)::before {
+	content: 'create';
+}
+
+#info-screen > ul > li:hover::before {
+	color: #09e674;
+}
+
 a:link, a:any-link, a:-webkit-any-link, a:visited, a:active {
 	color: #09e674;
 }
