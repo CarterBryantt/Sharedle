@@ -67,7 +67,7 @@ li {
 }
 
 #info-screen > ul > li:nth-child(1)::before {
-	content: 'cached';
+	content: 'event_repeat';
 }
 
 #info-screen > ul > li:nth-child(2)::before {
@@ -86,6 +86,11 @@ li {
 
 a:link, a:any-link, a:-webkit-any-link, a:visited, a:active {
 	color: #09e674;
+}
+
+label {
+	font-size: 21px;
+	color: #ffffff;
 }
 
 header {
@@ -489,6 +494,65 @@ header {
 	cursor: pointer;
 }
 
+/* SETTINGS*/
+.setting {
+	width: 80%;
+
+	display: flex;
+	flex-direction: column;
+	align-items: start;
+	justify-content: space-between;
+}
+
+.setting > label::before {
+	margin-right: 10px;
+	font-family: 'Material Icons Outlined';
+}
+
+.setting > label:nth-child(1)::before {
+	content: 'format_paint';
+}
+
+#theme-select {
+	width: 100%;
+	height: 36px;
+
+	border: solid 2px var(--color-shade-5);
+	border-radius: 12px;
+	background-color: var(--color-shade-3);
+
+	font-size: 16px;
+	color: #ffffff;
+}
+
+/* SOLUTION MESSAGE */
+.solution-message {
+	position: relative;
+	color: #ffffff;
+	font-size: 20px;
+}
+
+#define-button:hover {
+	filter: brightness(80%);
+	cursor: pointer;
+}
+
+#definition {
+	width: 200px;
+	height: 150px;
+	position: absolute;
+	left: 270px;
+	top: -50px;
+
+	background-color: var(--color-shade-4);
+	border: inset 5px #47484e;
+	border-radius: 12px;
+	padding: 10px;
+	display: none;
+
+	z-index: 1;
+}
+
 /* iPhone X */
 @media only screen 
   and (min-device-width: 375px) 
@@ -515,6 +579,11 @@ header {
 	#hard-reset {
 		bottom: 5px;
 		font-size: 8px;
+	}
+
+	#definition {
+		left: 0px;
+		top: 30px;
 	}
 }
 
@@ -545,6 +614,11 @@ header {
 		bottom: 5px;
 		font-size: 8px;
 	}
+
+	#definition {
+		left: 0px;
+		top: 30px;
+	}
 }
 
 @media (pointer:none), (pointer:coarse) {
@@ -568,5 +642,10 @@ header {
 	#hard-reset {
 		bottom: 5px;
 		font-size: 8px;
+	}
+
+	#definition {
+		left: 0px;
+		top: 30px;
 	}
 }

@@ -17,12 +17,13 @@ let creating, customWord, customUsed;
 let urlIndexUsed;
 
 let storage = {
-	get currentRow() { return JSON.parse(localStorage.getItem('current-row')); },
-	get urlParams() { return new URLSearchParams(localStorage.getItem('url-params')); },
-	get solutionIndex() { return JSON.parse(localStorage.getItem('solution-index')); },
+	get currentRow() { return JSON.parse( localStorage.getItem('current-row') ); },
+	get urlParams() { return new URLSearchParams( localStorage.getItem('url-params') ); },
+	get solutionIndex() { return JSON.parse( localStorage.getItem('solution-index') ); },
 	get solution() { return localStorage.getItem('solution'); },
 	get activeScreen() { return localStorage.getItem('active-screen'); },
-	get isInputDisabled() { return JSON.parse(localStorage.getItem('is-input-disabled')); }
+	get isInputDisabled() { return JSON.parse( localStorage.getItem('is-input-disabled') ); },
+	get themeIndex() { return JSON.parse( localStorage.getItem('theme-index') ); }
 }
 
 function setup() {
@@ -70,15 +71,17 @@ function setup() {
 
 	resizeGame();
 	fillInGuesses(); // Using the local storage, if the player is already playing a game, fill that game data in
+	selectTheme(storage.themeIndex);
+	document.getElementById('theme-select').value = document.getElementById('theme-select').options[storage.themeIndex].value;
 	showHideScreen(storage.activeScreen);
-	document.getElementById('wordle').innerHTML = `<b>The word was: ${storage.solution.toUpperCase()}</b>`;
+	document.getElementById('wordle').innerHTML = storage.solution.toUpperCase();
 } // Get game setup
 window.onload = setup();
 
 function keyPress(e) {
 	if (creating) { customInput(e); return; } // If the player is creating a word, use custon word input and exit function (exiting may not be necessary but just in case)
 
-	if (storage.isInputDisabled); // If input is disabled because the end screen is displayed or if the password is being entered, exit function
+	if (storage.isInputDisabled) return; // If input is disabled because the end screen is displayed or if the password is being entered, exit function
 	
 	if (e.type == "click") {
 		let keyDiv = e.target; // Get div clicked
@@ -132,7 +135,6 @@ function colorKey(letter, state) {
 		}
 	}
 } // Color keyboard key a given state color
-
 
 function updateWord(guess, row) {
 	for (let i = 0; i < 5; i++) {
@@ -362,12 +364,12 @@ function restartGame() {
 	initStorage();
 	showHideScreen(storage.activeScreen);
 
-	document.getElementById('wordle').innerHTML = `The word was: ${storage.solution.toUpperCase()}`;
+	document.getElementById('wordle').innerHTML = storage.solution.toUpperCase();
 
 	for (let i = 0; i < keyDivs.length; i++) {
 		if (keyDivs[i].classList.contains("dark-key")) {
 			keyDivs[i].classList.remove("dark-key");
-			keyDivs[i].style.background = "hsl(0, 0%, 95%)";
+			keyDivs[i].style.background = "var(--color-shade-2)";
 		}
 	} // Reset keyboard colors
 	
@@ -432,6 +434,7 @@ function initStorage() {
 
 	localStorage.setItem('active-screen', 'info'); // Screen to show when the menu button is clicked
 	localStorage.setItem('is-input-disabled', false); // Boolean value that won't allow the user to type letters if true
+	localStorage.setItem('theme-index', storage.themeIndex || '0'); // Index of theme player has selected from dropdown menu
 }
 
 function updateStorage(guess, states) {
@@ -540,12 +543,31 @@ async function shareCustom() {
 // ------------------------------------------------------------------------
 // THEME SELECTOR
 // ------------------------------------------------------------------------
-document.getElementById('theme-select').onchange = function() {
-	document.getElementById('theme-select')
+document.getElementById('theme-select').onchange = (e) => {
+	localStorage.setItem('theme-index', e.target.selectedIndex);
+	selectTheme(e.target.selectedIndex);
+}
+
+function selectTheme(themeIndex) {
 	let curvedSystem = ['#eee3e3', '#bbb0b1', '#8a8181', '#5d5454', '#332b2b', '#282121'];
 	let tacticMixture = ['#ad98a9', '#56515b', '#807482', '#46434d', '#323036', '#debdd0'];
 
 	for (let i = 0; i < 6; i++) {
-		document.documentElement.style.setProperty(`--color-shade-${i+1}`, [curvedSystem, tacticMixture][document.getElementById('theme-select').selectedIndex][i]);
+		document.documentElement.style.setProperty(`--color-shade-${i+1}`, [curvedSystem, tacticMixture][themeIndex][i]);
+	}
+}
+
+// ------------------------------------------------------------------------
+// DEFINE WORD
+// ------------------------------------------------------------------------
+document.getElementById('define-button').onclick = () => {
+	let definitionDiv = document.getElementById('definition');
+	switch(window.getComputedStyle(definitionDiv).display) {
+		case 'block':
+			definitionDiv.style.display = 'none';
+			break;
+		case 'none':
+			definitionDiv.style.display = 'block';
+			break;
 	}
 }
