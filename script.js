@@ -16,6 +16,8 @@ let creating, customWord, customUsed;
 
 let urlIndexUsed;
 
+let definitionIndex;
+
 let storage = {
 	get currentRow() { return JSON.parse( localStorage.getItem('current-row') ); },
 	get urlParams() { return new URLSearchParams( localStorage.getItem('url-params') ); },
@@ -40,6 +42,8 @@ function setup() {
 		customUsed = false; // Boolean value to keep track of if the custom word has already been played and solved
 		
 		urlIndexUsed = false; // Boolean value to keep track of if the index from the url has already been used as ta solution
+
+		definitionIndex = 0; // Index of the current definition being shown
 	} // Set up variables 
 
 	{
@@ -171,6 +175,7 @@ function showHideScreen(screen) {
 	switch(window.getComputedStyle(overlay).display) {
 		case "flex":
 			overlay.style.display = "none";
+			document.getElementById('definition-box').style.display = "none";
 			if (storage.activeScreen != 'end') localStorage.setItem('is-input-disabled', false); // Only allow input to be active if the game isn't over
 			break;
 		case "none":
@@ -560,20 +565,36 @@ function selectTheme(themeIndex) {
 // ------------------------------------------------------------------------
 // DEFINE WORD
 // ------------------------------------------------------------------------
-document.getElementById('define-button').onclick = () => {
-	let definitionDiv = document.getElementById('definition');
+document.getElementById('define-button').onclick = (e) => {
+	let definitionDiv = document.getElementById('definition-box');
 	switch(window.getComputedStyle(definitionDiv).display) {
-		case 'block':
+		case 'flex':
 			definitionDiv.style.display = 'none';
 			break;
 		case 'none':
-			definitionDiv.style.display = 'block';
+			definitionDiv.style.display = 'flex';
 			break;
 	}
+
+	let apiKey = "g1ypn5icbqdzrfmgfo9oc8rhqsr549nlepi025cidsyz6mvon";
+	let resultLimit = 20;
+	let url = `https://api.wordnik.com/v4/word.json/${storage.solution}/definitions?limit=${resultLimit}&includeRelated=false&useCanonical=false&includeTags=false&api_key=${apiKey}`;
+
+	fetch(url).then(response => { return response.json(); }).then(jsondata => showDefinition(jsondata) );
 }
 
-let word = "rainbow";
-let apiKey = "g1ypn5icbqdzrfmgfo9oc8rhqsr549nlepi025cidsyz6mvon";
-let url = `https://api.wordnik.com/v4/word.json/${storage.solution}/definitions?limit=200&includeRelated=false&useCanonical=false&includeTags=false&api_key=${apiKey}`;
+function showDefinition(data) {
+	let completeObjects = []; // Objects with contain the word, the part of speech, and the definition
+	for (let i = 0; i < data.length; i++) {
+		if(data[i].hasOwnProperty('word') && data[i].hasOwnProperty('partOfSpeech') && data[i].hasOwnProperty('text')) completeObjects.push(data[i]);
+	}
 
-fetch(url).then(response => { return response.json(); }).then(jsondata => { document.getElementById('definition').innerHTML = JSON.stringify(jsondata[2].text); });
+	console.log(completeObjects, data)
+	document.getElementById('change-definition-button').onclick = () => { definitionIndex = (definitionIndex + 1) % completeObjects.length; showDefinition(data); }
+
+	let definitionSource = completeObjects[definitionIndex];
+	let defParts = document.getElementById('definition-box').children;
+	defParts[0].innerHTML = definitionSource.word;
+	defParts[1].innerHTML = definitionSource.partOfSpeech;
+	defParts[2].innerHTML = definitionSource.text;
+}
