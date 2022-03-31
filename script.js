@@ -571,3 +571,9 @@ document.getElementById('define-button').onclick = () => {
 			break;
 	}
 }
+
+let word = "rainbow";
+let apiKey = "g1ypn5icbqdzrfmgfo9oc8rhqsr549nlepi025cidsyz6mvon";
+let url = `https://api.wordnik.com/v4/word.json/${storage.solution}/definitions?limit=200&includeRelated=false&useCanonical=false&includeTags=false&api_key=${apiKey}`;
+
+fetch(url).then(response => { return response.json(); }).then(jsondata => { document.getElementById('definition').innerHTML = JSON.stringify(jsondata[2].text); });
