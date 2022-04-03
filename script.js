@@ -360,7 +360,7 @@ function updateEndScreen() {
 	let resultLimit = 20;
 	let url = `https://api.wordnik.com/v4/word.json/${storage.solution}/definitions?limit=${resultLimit}&includeRelated=false&useCanonical=false&includeTags=false&api_key=${apiKey}`;
 
-	fetch(url).then(response => { return response.json(); }).then(jsondata => showDefinition(jsondata) );
+	fetch(url).then(response => { return response.json(); }).then(jsondata => showDefinition(jsondata) ).catch(err => console.log(err));
 }
 
 function restartGame() {
@@ -585,12 +585,6 @@ document.getElementById('define-button').onclick = (e) => {
 			definitionDiv.style.display = 'flex';
 			break;
 	}
-
-	let apiKey = "g1ypn5icbqdzrfmgfo9oc8rhqsr549nlepi025cidsyz6mvon";
-	let resultLimit = 20;
-	let url = `https://api.wordnik.com/v4/word.json/${storage.solution}/definitions?limit=${resultLimit}&includeRelated=false&useCanonical=false&includeTags=false&api_key=${apiKey}`;
-
-	fetch(url).then(response => { return response.json(); }).then(jsondata => showDefinition(jsondata) ).catch(err => console.log(err));
 }
 
 function showDefinition(data) {
