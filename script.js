@@ -78,7 +78,7 @@ function setup() {
 	selectTheme(storage.themeIndex);
 	document.getElementById('theme-select').value = document.getElementById('theme-select').options[storage.themeIndex].value;
 	showHideScreen(storage.activeScreen);
-	document.getElementById('wordle').innerHTML = storage.solution.toUpperCase();
+	updateEndScreen();
 } // Get game setup
 window.onload = setup();
 
@@ -321,12 +321,6 @@ function guessWord(guess) {
 		localStorage.setItem('active-screen', 'end');
 		localStorage.setItem('is-input-disabled', true);
 
-		let newURLParams = new URLSearchParams(window.location.search);
-		let decryptedWord = atob(newURLParams.get('custom')).length == 5 ? atob(newURLParams.get('custom')) : null;
-		let urlIndex = JSON.parse(newURLParams.get('index'));
-		if (decryptedWord !== null) customUsed = true;
-		if (urlIndex !== null) urlIndexUsed = true;
-
 		let winMessage;
 		switch(storage.currentRow) {
 			case 0:
@@ -359,17 +353,33 @@ function guessWord(guess) {
 	currentGuess = ""; // Clear current guess
 }
 
+function updateEndScreen() {
+	document.getElementById('wordle').innerHTML = storage.solution.toUpperCase();
+
+	let apiKey = "g1ypn5icbqdzrfmgfo9oc8rhqsr549nlepi025cidsyz6mvon";
+	let resultLimit = 20;
+	let url = `https://api.wordnik.com/v4/word.json/${storage.solution}/definitions?limit=${resultLimit}&includeRelated=false&useCanonical=false&includeTags=false&api_key=${apiKey}`;
+
+	fetch(url).then(response => { return response.json(); }).then(jsondata => showDefinition(jsondata) );
+}
+
 function restartGame() {
 	let tempURLParams = storage.urlParams;
 	localStorage.clear();
 	localStorage.setItem('url-params', tempURLParams);
+
+	let newURLParams = new URLSearchParams(window.location.search);
+	let decryptedWord = atob(newURLParams.get('custom')).length == 5 ? atob(newURLParams.get('custom')) : null;
+	let urlIndex = JSON.parse(newURLParams.get('index'));
+	if (decryptedWord !== null) customUsed = true;
+	if (urlIndex !== null) urlIndexUsed = true;
 
 	currentGuess = "";
 
 	initStorage();
 	showHideScreen(storage.activeScreen);
 
-	document.getElementById('wordle').innerHTML = storage.solution.toUpperCase();
+	updateEndScreen();
 
 	for (let i = 0; i < keyDivs.length; i++) {
 		if (keyDivs[i].classList.contains("dark-key")) {
@@ -409,7 +419,7 @@ async function share() {
 	try {
 		await navigator.share({
 			title: 'Sharedle',
-			text: `Sharedle ${storage.solutionIndex} ${JSON.parse(localStorage.getItem('guessed-words'))[5] != storage.solution && storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?index=${storage.solutionIndex}\nSolve your own: https://carterbryantt.github.io/Sharedle/`
+			text: `Sharedle ${storage.solutionIndex} ${JSON.parse(localStorage.getItem('guessed-words'))[5] != storage.solution && storage.currentRow == 5 ? "X" : storage.currentRow+1}/6\nTry it yourself!\n${emojis}\nSolve the same word: https://carterbryantt.github.io/Sharedle/?${(!customUsed && atob(new URLSearchParams(window.location.search).get('custom')) == storage.solution) ? `custom=${btoa(storage.solution)}` : `index=${storage.solutionIndex}`}\nSolve your own: https://carterbryantt.github.io/Sharedle/`
 		});
 	} catch(err) {
 		displayMessage("Sorry, an error occured when trying to share.\nPlease check your device settings or try again later.", 2000);
